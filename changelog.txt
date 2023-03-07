@@ -1,0 +1,13 @@
+version 3.0
+* Fix for MediaWiki >= 1.34+ by Aleš Kapica (User:Want)
+* New functions for substitution of the unmaintained extensions:
+  - ImageSizeInfoFunctions (Sep 23 1019 last commit a57b9dd)
+  - MediaFunctions (Feb 19 2021 last commit d3c29ef)
+* Solved problem with $wgAllowImageTag (is deprecated since MW 1.35+)
+* Removed unusable code
+
+version 2.1
+* Fix for using with PHP version 7.x
+
+version 2.0.0
+* Initial version uploaded by Robert Pooley to github

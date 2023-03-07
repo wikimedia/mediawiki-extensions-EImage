@@ -1,0 +1,13 @@
+{
+	"@metadata": {
+		"authors": [
+			"Robert Pooley",
+			"Aleš Kapica"
+		]
+	},
+	"eimage-desc"               : "Display images from image hosting services as if they were stored locally.",
+	"eimage-invalidimageid"     : "Invalid image ID",
+	"eimage-thumbnail-more"     : "Enlarge",
+	"eimage-rawmissingwidth"    : "Using raw URLs requires specifying the width.",
+	"eimage-rawmissingheight"   : "Using raw URLs requires specifying the height."
+}

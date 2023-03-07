@@ -1,0 +1,138 @@
+{{Extension
+|username        = Want
+|author          = Robert Pooley [http://robpol86.com/about/ Robpol86], Aleš Kapica
+|status          = stable
+|type1           = parser function
+|imagesize       = 200px
+|compatibility policy = master
+|phabricator     = MediaWiki-extensions-EImage
+|version         = 3.0
+|update          = 2023-03-07
+|mediawiki       = 1.34+
+|php             = 7.4+
+|needs-updatephp = No
+|download={{WikimediaDownload|EImage|nosnapshot=1}}
+|tags={{tag|eimage|open}} (not need anymore)
+|description     = Display images from another hosts as if they were stored locally.
+|example         = Registration scheme on [https://www.thewoodcraft.org/wiki/index.php/Thewoodcraft.org:Registrace Thewoodcraft.org]
+}}
+
+'''EImage''' allows users to display images from external image hosts as if they were stored locally. External images may be thumbnailed/resized/framed just like local images and the syntax used is very similar to MediaWiki's [[Help:Images|Images]] syntax. EImage can:
+* Display images from another sites,
+* display titles or comments from the image host,
+* and also overlay the base image by text (or image). Templates, wiki syntax or translation can be used too. For example see page about [https://www.thewoodcraft.org/wiki/index.php/Thewoodcraft.org:Registrace account creation process], or documentation of the [https://www.thewoodcraft.org/wiki/index.php/Thewoodcraft.org:Registrace Template:Image] on wiki Thewoodcraft.org
+
+==Installation==
+If you want use '''#eimgexif''', make sure that [https://exiftool.org/ exiftool] ist installed.
+{{ExtensionInstall
+|registration=required
+|localsettings = 
+# $wgEImageOnlyLocalSource = true;
+# $wgEImageUseExiftool = true;
+# $wgEImageEmptyPng = "empty.png";
+}}
+{{Note|1=EImage is great extension for fans pure wikitext syntax, because is without dependency on [[w:Lua_(programming_language)|Lua]] ([[Extension:Scribunto]]), and can use output functions [[Extension:ParserFunctions]], [[Extension:Variables]] & etc. pure only PHP code.}}
+
+==Syntax and Examples==
+EImage to disposition this types of functions:
+* Image ('''#eimage''') : The "main" options for displaying the image. This is similar to MediaWiki's [[Help:Images|Images]].
+* Annotations ('''#eimagea'''): This is a separate parser function for an annotation. You can have as many of these as you want.
+* Functions usable to get info about image (or another type of file) :
+:: '''#eimgw''' : get ''width'' of file 
+:: '''#eimgh''' : get ''height'' of file 
+:: '''#earea''' :  get info about ''width'' and ''height'' of the file, in #eimage usable form
+:: '''#eimgsize''' : get ''size'' of the file for humans
+:: '''#eimgmime''' : get ''mimetype'' (usable in templates)
+:: '''#epages''' : get info about number of pages; usable in templates for multipage file detection
+:: '''#eimgexif''' : get exif tags from local file - <code>exiftool</code> recommend (experimental)
+:: '''#epath''' : get path of file, without server
+
+{{Note|
+* Inspiration for functions '''eimgw''' and '''eimgh''', was [[Extension:ImageSizeInfoFunctions]] (last commit into Github Feb 8 2019)
+* Next functions: '''earea''', '''eimgsize''', '''eimgmime''' and '''epages''' was created by [[Extension:MediaFunctions]] (unmaitained)
+* Function '''eimgexif''' base on <code>exiftool</code> get info rightly from file in local storage, not database.}}
+
+=== #eimage ===
+
+The full syntax for displaying an image is:
+ <nowiki>{{</nowiki>#eimage:''image''|''options''|''caption''}}
+
+Refer to http://www.mediawiki.org/wiki/Help:Images for detailed descriptions. Below is a list of options available in EImage:
+
+First parameter, URL of the image to display. If a raw URL is entered, you will need to also specify the ''width'' and ''height''. If you want use image from local wiki, we can use [[Help:Magic_words#filepath|Magic word]] <code><nowiki>{{filepath:…}}</nowiki></code>, which can be parametrized. For example:
+
+ <nowiki>{{#eimage:{{filepath:image.svg}}|{{#eimgh:image.svg}}x{{#eimgw:image.svg}}px|frameless|link={{fullurl:image.svg}}}}</nowiki>
+
+Next usable options:
+: ''Format'' : '''border''' or '''frameless'''
+: ''Resizing'' : ''{width}'''''x'''''{height}'''''px'''
+: ''Horizontal alignment'' : one of '''inline''' and/or '''left''', '''right''', '''center''', '''none'''
+: ''Position'' : '''inline''', displays the image(+frame) inline instead of as a floating block (it overrides the float option). Works best with '''none'''. Useful for displaying multiple thumbnails on one line.
+: ''Vertical alignment'' : one of '''baseline''', '''sub''', '''super''', '''top''', '''text-top''', '''middle''', '''bottom''', '''text-bottom'''
+: ''Link'' :  '''link='''''{target}'' Currently only links that start with http/https/ftp are supported.
+
+These options change the defaults for all annotations in an image (not all images). If no annotations are used, these are ignored:
+: ''Horizontal alignment'' : '''aalign='''
+: ''Background color'' : '''abg=''' (default is transparent)
+:: ''Font family'' : '''afamily='''
+:: ''Font size'' : '''asize='''
+:: ''Font weight'' : '''aweight='''
+:: ''Font style'' : '''astyle='''
+:: ''Font shadow'' : '''ashadow='''
+:: ''Font color'' : '''acolor='''
+: ''Line height'' : '''aheight='''
+
+Last position parameter is accepted every as ''alternative note of image''.
+
+Some examples:
+
+ <nowiki>{{#eimage:http://upload.wikimedia.org/wikipedia/mediawiki/e/e1/Eimage_example.png|410x579px}}</nowiki>
+
+If wiki has configured by [[Manual:$wgForeignFileRepos]] using images from another wiki, i.e. commons.wikimedia.org, we can use function '''#epath'''
+
+ <nowiki>{{#eimage:https://upload.wikimedia.org{{#epath:File:Wikimedia Hackathon Prague 2019 - Group Photo - CLK - cropped.jpg}}|200x400px}}</nowiki>
+
+If use local image, you can use functions '''#earea''':
+
+ <nowiki>{{#eimage:{{filepath:localimage.svg}}|{{#earea:localimage.svg}}px}}</nowiki>
+
+or '''#eimgh''' and '''#eimgw''', which can be use wit combination with [[Extension:ParserFunctions|parserfunctions]], for dynamic resize.
+
+ <nowiki>{{#eimage:{{filepath:image.svg}}|{{#eimgh:image.svg}}x{{#eimgw:image.svg}}px|frameless|link=https://example.com/}}</nowiki>
+
+=== #eimagea ===
+Each image can have any number of annotations. In the {{#eimage}} tag use the '''annot=''' option to specify an annotation. The value of '''annot=''' is another function called ''{{#eimagea}}''. Below are the options available for ''{{#eimagea}}'':
+* ''Horizontal alignment'' option: one of '''left''', '''right''', '''center''', '''justify''', '''inherit'''
+* ''Background color'' option: '''bg='''
+* ''Font'' parameters :
+:: ''family'' : '''family='''
+:: ''size'' : '''size='''
+:: ''weight'' : '''weight='''
+:: ''style'' : '''style='''
+:: ''shadow'' : '''shadow='''
+* ''Font color'' : '''color='''
+* ''Line height'' : '''height='''
+
+If a parameter does not match any of the other possibilities, it is assumed to be the annotation text. Annotations support wiki-formatting.
+
+Some examples:
+ <nowiki>{{#eimage:{{filepath:background-image.jpg}}|200px|acolor=white|This is image from wiki repository
+   |annot={{#eimagea:10x20|This is an annotation.}}
+   |annot={{#eimagea:20x40|size=20|A bigger annotation.}}
+   |annot={{#eimagea:30x60|'''Bold Annotation'''}}
+   |annot={{#eimagea:40x80|shadow=-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000|Shadowed Annotation}}
+   |annot={{#eimagea:50x100|[http://google.com Linked annotation]}}
+   |annot={{#eimagea:60x120|right|This is a long and right justified anotation.}}
+}}</nowiki>
+
+== History ==
+
+* Extension EImage was created in 2011 by Robert Pooley, who was working as an IT Infrastructure specialist for Symantec. His inspiration was [[w:en:Template:Annotated_image|Template:Annotated image]] (Wikipedia). His idea: to integrate images from other sites into MediaWiki pages as background layers, and add on top layers with notes in wiki code and anothers images, was cool.
+: His implementation supported services as Flickr, or … fot it used file <code>JSLikeHTMLElement.php</code> where found inspiration how-to convert <code><a href="" /></code> links common in Flickr comments to wiki-formatted links.
+: In 2013 Robert change jobs and pushed the code to Github repository:  https://github.com/Robpol86/EImage.git
+* Thewoodcraft.org has used EImage since 29 May 2018, (MW 1.24.1 and PHP 5.x), but after upgrading to MW 1.33-wmf.22 (29. March 2019) with dependency on PHP 7.3, the code of this extension needed repair. The first serious use of it was the documentation page of [https://www.thewoodcraft.org/wiki/index.php/Template:Image Template:Image], where is used for demonstrate errors on the screenshots.
+* On 19 February 2021‎, [[User:Pppery|Pppery]] archived this page, because the download link was pointing to a GitHub repository marked as "This repository has been archived by the owner on Dec 13, 2020. It is now read-only."
+* After upgrading Thewoodcraft.org to MW 1.39.2 (24. February 2023), I found out this fact, and that's why I decided to maintain this extension in addition to the [[Extension:AccessControl]], and add other features used on my site. From the last version (waiting to repository created), I removed unusable code, and added functions from another orphaned extension used by me. New functions <code><nowiki>{{#imgw}}</nowiki></code> and <code><nowiki>{{#imgh}}</nowiki></code> (origin at [[Extension:ImageSizeInfoFunctions]]) and were the inspiration for next function <code><nowiki>{{#epath}}</nowiki></code> -- [[User:Want|Want]] ([[User talk:Want|talk]]) 10:37, 4 March 2023 (UTC)
+
+== References ==
+<references />
