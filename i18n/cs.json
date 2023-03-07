@@ -1,0 +1,12 @@
+{
+	"@metadata": {
+		"authors": [
+			"Aleš Kapica"
+		]
+	},
+	"eimage-desc"               : "Zobrazuje obrázky z jiného serveru tak, jako by byly uploadované do wiki.",
+	"eimage-invalidimageid"     : "Neplatné ID obrázku",
+	"eimage-thumbnail-more"     : "Zvětšit",
+	"eimage-rawmissingwidth"    : "Obrázek zadaný přes URL musí mít nastavenou šířku.",
+	"eimage-rawmissingheight"   : "Obrázek zadaný přes URL musí mít nastavenou výšku."
+}

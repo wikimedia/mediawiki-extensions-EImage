@@ -1,0 +1,62 @@
+{
+	"name": "EImage",
+	"version": "3.0",
+	"author": [
+		"[http://www.robpol86.com/index.php/User:Robpol86 Robert Pooley]",
+		"[https://www.mediawiki.org/wiki/m:User:Want Aleš Kapica]"
+	],
+	"type": "parserhook",
+	"url": "https://www.mediawiki.org/wiki/Extension:EImage",
+	"descriptionmsg": "eimage-desc",
+	"license-name": "GPL-2.0-or-later",
+	"requires": {
+		"MediaWiki": ">= 1.35.0"
+	},
+	"MessagesDirs": {
+		"EImage": [
+			"i18n"
+		]
+	},
+	"ExtensionMessagesFiles": {
+		"EImageMagick": "EImage.i18n.magic.php"
+	},
+	"config": {
+		"EImageOnlyLocalSource": {
+			"value": true,
+			"description": "By default searched info about image files in local repository"
+		},
+		"EImageUseExiftool": {
+			"value": true,
+			"description": "By default searched info about image files in local repository"
+		},
+		"EImageStaleMinutes": {
+			"value": 60,
+			"description": "Refresh cached metadata if the stored entry is this many minutes old"
+		},
+		"EImageTableName": {
+			"value": "eimage_metadata_cache",
+			"description": "Name table in DB for cache of the images presented by EImage"
+		},
+		"EImageEmptyPng": {
+			"value": "empty.png",
+			"description": "Default empty png if isn't set any background image"
+		}
+	},
+	"Hooks": {
+		"ParserFirstCallInit"		: "EImageHooks::eImageExtension",
+		"ParserClearState"		: "EImageHooks::onParserClearState",
+		"ParserOutputPostCacheTransform" : "EImageStatic::decode",
+		"ArticlePurge"			: "EImageStatic::purge",
+		"LoadExtensionSchemaUpdates"	: "EImageStatic::createTables"
+	},
+	"AutoloadClasses": {
+		"EImageHooks"			: "EImage.hooks.php",
+		"EImageData"			: "includes/EImageData.php",
+		"EImageQuery"			: "includes/EImageQuery.php",
+		"EImageStatic"			: "includes/EImageStatic.php",
+		"EImageStaticAnnot"		: "includes/EImageStaticAnnot.php",
+		"EImageStaticHtml"		: "includes/EImageStaticHtml.php",
+		"EImageStaticMain"		: "includes/EImageStaticMain.php"
+	},
+	"manifest_version": 2
+}
