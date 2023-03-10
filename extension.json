@@ -25,6 +25,14 @@
 			"value": true,
 			"description": "By default searched info about image files in local repository"
 		},
+		"EImageExpirationTime": {
+			"value": 1,
+			"description": "After query actualize EImage time milestone for objects in local repository – default is one day (1)"
+		},
+		"EImageNoCache": {
+			"value": false,
+			"description": "True disable using DB local cache and repository for images"
+		},
 		"EImageUseExiftool": {
 			"value": true,
 			"description": "By default searched info about image files in local repository"
@@ -54,6 +62,7 @@
 		"EImageData"			: "includes/EImageData.php",
 		"EImageQuery"			: "includes/EImageQuery.php",
 		"EImageStatic"			: "includes/EImageStatic.php",
+		"EImageStaticDiv"		: "includes/EImageStaticDiv.php",
 		"EImageStaticAnnot"		: "includes/EImageStaticAnnot.php",
 		"EImageStaticHtml"		: "includes/EImageStaticHtml.php",
 		"EImageStaticMain"		: "includes/EImageStaticMain.php"

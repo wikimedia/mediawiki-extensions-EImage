@@ -103,7 +103,7 @@ class EImageStaticHtml {
         if ( $data->get_ei_errormsg() !== null ) {
             // Display error messages as annotations over the image.
             $e = Html::rawElement( 'div', 
-                array( 'style' => 'position:absolute; left:1px; top:1px; font-size:15px; color:red;' ), 
+                array( 'class' => 'target' ,  'style' => 'position:absolute; left:1px; top:1px; font-size:15px; color:red;' ),
                 $data->get_ei_errormsg() 
             );
             array_push( $annot, $e );
@@ -141,7 +141,7 @@ class EImageStaticHtml {
             $div_style .= " height:" . $data->getHeight() . "px;";
 
             $imgTag = Html::rawElement( 'div',
-                array( 'style' => 'position:relative; display:inline-block; overflow:hidden; ' . $div_style ),
+                array( 'class' => 'target' , 'style' => 'position:relative; display:inline-block; overflow:hidden; ' . $div_style ),
                 implode( '', $annot )
             );
 
