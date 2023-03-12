@@ -12,17 +12,15 @@ class EImageHooks {
 	 * @param Parser $parser instance of Parser
 	 * @return bool true
 	 */
-	public static function eImageExtension(
-		Parser $parser
-		) {
+	public static function eImageExtension( Parser $parser ) {
 		// Function hook for annotation layers
 		$parser->setFunctionHook( 'eimagea', [ 'EImageStaticAnnot', 'annotation' ], SFH_OBJECT_ARGS );
 		// Function hook for base image container
-		$parser->setFunctionHook( 'eimage', [ 'EImageStaticMain', 'readInput'], SFH_OBJECT_ARGS );
+		$parser->setFunctionHook( 'eimage', [ 'EImageStaticMain', 'readInput' ], SFH_OBJECT_ARGS );
 		// Function hook for base image container
-		$parser->setFunctionHook( 'eimg', [ 'EImageStaticDiv', 'image'], SFH_OBJECT_ARGS );
+		$parser->setFunctionHook( 'eimg', [ 'EImageStaticDiv', 'image' ], SFH_OBJECT_ARGS );
 		// Function hook for base block container
-		$parser->setFunctionHook( 'eibox', [ 'EImageStaticDiv', 'block'], SFH_OBJECT_ARGS );
+		$parser->setFunctionHook( 'eibox', [ 'EImageStaticDiv', 'block' ], SFH_OBJECT_ARGS );
 		// Function hook for width img file
 		$parser->setFunctionHook( "eimgw", "EImageHooks::eimageWidth" );
 		// Function hook for height img file
@@ -40,7 +38,7 @@ class EImageHooks {
 		// Function hook for img exif info - parameter
 		$parser->setFunctionHook( "eimgexif", "EImageHooks::eimageExif" );
 		// Function hook for add exif info into img, if is supported - parameter
-//		$parser->setFunctionHook( "eiaddexif", "EImageHooks::getImageLocalPath" );
+		// $parser->setFunctionHook( "eiaddexif", "EImageHooks::getImageLocalPath" );
 
 		return true;
 	}
@@ -49,10 +47,10 @@ class EImageHooks {
 	 * Function for when the parser object is being cleared.
 	 * @see	https://www.mediawiki.org/wiki/Manual:Hooks/ParserClearState
 	 *
-	 * @param $parser
+	 * @param Parser &$parser
 	 * @return bool
 	 */
-	static public function onParserClearState( &$parser ) {
+	public static function onParserClearState( &$parser ) {
 		return true;
 	}
 
@@ -60,15 +58,15 @@ class EImageHooks {
 	 * Error message constants
 	 */
 	const ERR_INVALID_TITLE = 'eimage-invalid-title';
-	const ERR_NOT_EXIST = NULL;
+	const ERR_NOT_EXIST = null;
 	const ERR_UNKNOWN_VALUE = 0;
 
 	/**
 	 * Function to get the width of the image.
 	 *
-	 * @param	$parser	Parser object passed a reference
-	 * @param	string	Name of the image being parsed in
-	 * @return	mixed	integer of the width or error message.
+	 * @param Parser $parser Parser object passed a reference
+	 * @param string $name Name of the image being parsed in
+	 * @return mixed integer of the width or error message.
 	 */
 	public static function eimageWidth( $parser, $name = '' ) {
 		$file = self::resolve( $name );
@@ -81,9 +79,9 @@ class EImageHooks {
 	/**
 	 * Function to get the height of the image.
 	 *
-	 * @param	$parser	Parser object passed a reference
-	 * @param	string	Name of the image being parsed in
-	 * @return	mixed	integer of the height or error message.
+	 * @param Parser $parser Parser object passed a reference
+	 * @param string $name Name of the image being parsed in
+	 * @return mixed integer of the height or error message.
 	 */
 	public static function eimageHeight( $parser, $name = '' ) {
 		$file = self::resolve( $name );
@@ -98,14 +96,14 @@ class EImageHooks {
 	 * Formated as string WxH for using as parameter
 	 * of the 'eimage'
 	 *
-	 * @param	$parser	Parser object passed a reference
-	 * @param	string	Name of the image being parsed in
-	 * @return	string or NULL
+	 * @param Parser $parser Parser object passed a reference
+	 * @param string $name Name of the image being parsed in
+	 * @return string or NULL
 	 */
 	public static function eimageArea( $parser, $name = '' ) {
 		$file = self::resolve( $name );
 		if ( $file instanceof File ) {
-			return $file->getWidth() . 'x' . $file->getHeight() ;
+			return $file->getWidth() . 'x' . $file->getHeight();
 		}
 		return self::ERR_UNKNOWN_VALUE;
 	}
@@ -128,14 +126,14 @@ class EImageHooks {
 	/**
 	 * Function to get the path of the image.
 	 *
-	 * @param	$parser	Parser object passed a reference
-	 * @param	string	Name of the image being parsed in
-	 * @return	string	or NULL
+	 * @param Parser $parser Parser object passed a reference
+	 * @param string $name Name of the image being parsed in
+	 * @return string or NULL
 	 */
-	static public function eimageLocalPath( $parser, $name = '' ) {
+	public static function eimageLocalPath( $parser, $name = '' ) {
 		$file = self::resolve( $name );
 		if ( $file instanceof File ) {
-			return parse_url($file->getURL() , PHP_URL_PATH);
+			return parse_url( $file->getURL(), PHP_URL_PATH );
 		}
 		return self::ERR_NOT_EXIST;
 	}
@@ -160,7 +158,7 @@ class EImageHooks {
 	 *
 	 * @param Parser $parser Calling parser
 	 * @param string $name File name
-	 * @return integer or NULL
+	 * @return int or NULL
 	 */
 	public static function eimagePages( $parser, $name = '' ) {
 		$file = self::resolve( $name );
@@ -187,51 +185,54 @@ class EImageHooks {
 		$file = self::resolve( $name );
 		if ( $file instanceof File ) {
 			$parser->getOutput()->addImage( $file->getTitle()->getDBkey() );
-			switch ($meta) {
+			switch ( $meta ) {
 				case 'meta':
-					break ;
-				default : if ( $file->getLocalRefPath() ) {
-					if ( $wgEImageUseExiftool ) {
-						$data =  shell_exec('exiftool -php ' . $file->getLocalRefPath() );
-						eval ( "\$exiftagy = " . $data . ";" );
-						if (is_array($exiftagy)) {
-							if ( count( $exiftagy ) == 1 ) {
-//					return print_r( array_keys($exiftagy[0][ $meta ] );
-								switch ($meta) {
-									case 'array' : 
-										return serialize($exiftagy[0]);
-										break;
-									case 'list' :
-										return implode( ', ' , array_keys($exiftagy[0]) );
-										break;
-									case 'template' :
-										break;
-									default : return $exiftagy[0][$meta];
+					break;
+				default:
+					if ( $file->getLocalRefPath() ) {
+						if ( $wgEImageUseExiftool ) {
+							// phpcs:ignore MediaWiki.Usage.ForbiddenFunctions.shell_exec
+							$data = shell_exec( 'exiftool -php ' . $file->getLocalRefPath() );
+							eval( "\$exiftagy = " . $data . ";" );
+							if ( is_array( $exiftagy ) ) {
+								if ( count( $exiftagy ) == 1 ) {
+									// return print_r( array_keys($exiftagy[0][ $meta ] );
+									switch ( $meta ) {
+										case 'array':
+											return serialize( $exiftagy[0] );
+											break;
+										case 'list':
+											return implode( ', ', array_keys( $exiftagy[0] ) );
+											break;
+										case 'template':
+											break;
+									default:
+										return $exiftagy[0][$meta];
+									}
 								}
 							}
-						}
-					} else {
+						} else {
 							$fp = fopen( $file->getLocalRefPath(), 'rb' );
-							if (!$fp) {
+							if ( !$fp ) {
 								return self::ERR_NOT_EXIST;
 							}
 						try {
-							$headers = exif_read_data($fp);
+							$headers = exif_read_data( $fp );
 						} catch ( Exception $e ) {
 							return wfMessage( 'error_unknown_filetype' )->text();
 						}
-							if ($headers) {
-								switch ($meta ) {
-									case 'serialize' :
-										return serialize($headers);
-									case 'json' :
-										return "<!-- " . print_r($headers) . " -->";
-								default :
+							if ( $headers ) {
+								switch ( $meta ) {
+									case 'serialize':
+										return serialize( $headers );
+									case 'json':
+										return "<!-- " . print_r( $headers ) . " -->";
+								default:
 									break;
 								}
 							}
+						}
 					}
-				}
 			}
 			return $meta;
 		}

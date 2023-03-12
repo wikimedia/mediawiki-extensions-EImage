@@ -7,20 +7,20 @@
  *
  * Internationalization file for magic words.
  */
- 
-$magicWords = array();
- 
-$magicWords['en'] = array(
-   'eimage' => array( 0, 'eimage' ),
-   'eimagea' => array( 0, 'eimagea' ),
-   'eimg' => array( 0, 'eimg' ),
-   'eibox' => array( 0, 'eibox' ),
-   'eimgw' => array( 0, 'eimgw' ),
-   'eimgh' => array( 0, 'eimgh' ),
-   'earea' => array( 0, 'earea' ),
-   'eimgsize' => array( 0, 'eimgsize' ),
-   'eimgmime' => array( 0, 'eimgmime' ),
-   'epages' => array( 0, 'epages' ),
-   'eimgexif' => array( 0, 'eimgexif' ),
-   'epath' => array( 0, 'epath' )
-);
+
+$magicWords = [];
+
+$magicWords['en'] = [
+   'eimage' => [ 0, 'eimage' ],
+   'eimagea' => [ 0, 'eimagea' ],
+   'eimg' => [ 0, 'eimg' ],
+   'eibox' => [ 0, 'eibox' ],
+   'eimgw' => [ 0, 'eimgw' ],
+   'eimgh' => [ 0, 'eimgh' ],
+   'earea' => [ 0, 'earea' ],
+   'eimgsize' => [ 0, 'eimgsize' ],
+   'eimgmime' => [ 0, 'eimgmime' ],
+   'epages' => [ 0, 'epages' ],
+   'eimgexif' => [ 0, 'eimgexif' ],
+   'epath' => [ 0, 'epath' ]
+];

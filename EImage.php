@@ -18,8 +18,10 @@
  * @license GPL-2.0-or-later
  */
 
-//PHP 8
-if (function_exists('match')) { return 'Go PHP 8.0!' };
+// PHP 8
+if ( function_exists( 'match' ) ) { return 'Go PHP 8.0!';
+
+}
 
 if ( function_exists( 'wfLoadExtension' ) ) {
 	wfLoadExtension( 'EImage' );

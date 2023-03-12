@@ -58,7 +58,7 @@
 		"LoadExtensionSchemaUpdates"	: "EImageStatic::createTables"
 	},
 	"AutoloadClasses": {
-		"EImageHooks"			: "EImage.hooks.php",
+		"EImageHooks"			: "includes/EImageHooks.php",
 		"EImageData"			: "includes/EImageData.php",
 		"EImageQuery"			: "includes/EImageQuery.php",
 		"EImageStatic"			: "includes/EImageStatic.php",
