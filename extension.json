@@ -59,6 +59,9 @@
 	},
 	"AutoloadClasses": {
 		"EImageHooks": "includes/EImageHooks.php",
+		"EImageBOX": "includes/EImageBOX.php",
+		"EImageIMG": "includes/EImageIMG.php",
+		"EImageQR": "includes/EImageQR.php",
 		"EImageData": "includes/EImageData.php",
 		"EImageQuery": "includes/EImageQuery.php",
 		"EImageStatic": "includes/EImageStatic.php",
