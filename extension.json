@@ -51,21 +51,21 @@
 		}
 	},
 	"Hooks": {
-		"ParserFirstCallInit"		: "EImageHooks::eImageExtension",
-		"ParserClearState"		: "EImageHooks::onParserClearState",
-		"ParserOutputPostCacheTransform" : "EImageStatic::decode",
-		"ArticlePurge"			: "EImageStatic::purge",
-		"LoadExtensionSchemaUpdates"	: "EImageStatic::createTables"
+		"ParserFirstCallInit": "EImageHooks::eImageExtension",
+		"ParserClearState": "EImageHooks::onParserClearState",
+		"ParserOutputPostCacheTransform": "EImageStatic::decode",
+		"ArticlePurge": "EImageStatic::purge",
+		"LoadExtensionSchemaUpdates": "EImageStatic::createTables"
 	},
 	"AutoloadClasses": {
-		"EImageHooks"			: "includes/EImageHooks.php",
-		"EImageData"			: "includes/EImageData.php",
-		"EImageQuery"			: "includes/EImageQuery.php",
-		"EImageStatic"			: "includes/EImageStatic.php",
-		"EImageStaticDiv"		: "includes/EImageStaticDiv.php",
-		"EImageStaticAnnot"		: "includes/EImageStaticAnnot.php",
-		"EImageStaticHtml"		: "includes/EImageStaticHtml.php",
-		"EImageStaticMain"		: "includes/EImageStaticMain.php"
+		"EImageHooks": "includes/EImageHooks.php",
+		"EImageData": "includes/EImageData.php",
+		"EImageQuery": "includes/EImageQuery.php",
+		"EImageStatic": "includes/EImageStatic.php",
+		"EImageStaticDiv": "includes/EImageStaticDiv.php",
+		"EImageStaticAnnot": "includes/EImageStaticAnnot.php",
+		"EImageStaticHtml": "includes/EImageStaticHtml.php",
+		"EImageStaticMain": "includes/EImageStaticMain.php"
 	},
 	"manifest_version": 2
 }

@@ -1,13 +1,12 @@
 {
 	"@metadata": {
 		"authors": [
-			"Robert Pooley",
-			"Aleš Kapica"
+			"Kizule"
 		]
 	},
-	"eimage-desc"               : "Display images from image hosting services as if they were stored locally.",
-	"eimage-invalidimageid"     : "Invalid image ID",
-	"eimage-thumbnail-more"     : "Enlarge",
-	"eimage-rawmissingwidth"    : "Using raw URLs requires specifying the width.",
-	"eimage-rawmissingheight"   : "Using raw URLs requires specifying the height."
+	"eimage-desc": "{{desc|name=EImage|url=https://www.mediawiki.org/wiki/Extension:EImage}}",
+	"eimage-invalidimageid": "Error message",
+	"eimage-thumbnail-more": "Option",
+	"eimage-rawmissingwidth": "Error when raw URLs don't have the width specified.",
+	"eimage-rawmissingheight": "Error when raw URLs don't have the height specified."
 }
