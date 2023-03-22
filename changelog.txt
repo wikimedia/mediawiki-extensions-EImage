@@ -1,3 +1,15 @@
+version 3.3
+* Removed unused variables and code.
+* Support for DB scheme in JSON
+* Integrated new features (not completly)
+  - '#eimg' support crop, resize, link & etc.
+  - Generated images can stored in local directory (local cache)
+  - Reworked image has own copyright in exif tags by site
+* New maintainers script for testing
+
+version 3.2
+* Transitional version
+
 version 3.1
 * Code is prepared for use of the new features.
   From version 3.2 will be possible use local storage for image

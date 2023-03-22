@@ -95,43 +95,6 @@ class EImageStatic {
 	}
 
 	/**
-	 * Called when user wants to purge a wiki article. Does this by setting the last update time of all images from
-	 * the requested article to a time older than the $wgEImageStaleMinutes threshold. This is done before the page
-	 * loads, so when the page loads after MediaWiki purges the page, the page will query the host API for new data.
-	 *
-	 * @param Article $article
-	 * @return bool Always true.
-	 */
-	public static function purge( $article ) {
-		// 1.39 Table with info about external image sources by ID identified – not used for now
-		// global $wgDBprefix, $wgEImageStaleMinutes, $wgEImageTableName;
-		//        $title = base64_encode( $article->getTitle()->getText() ); // Similar to {{PAGENAME}}.
-		//        $minus = (int) ($wgEImageStaleMinutes * 61);
-		//        $dbw = wfGetDB( DB_MASTER );
-		//        $dbw->query(
-		//            "UPDATE `{$wgDBprefix}{$wgEImageTableName}`" .
-		//            " SET ei_time_lu = ei_time_lu - $minus" .
-		//            " WHERE ei_articles LIKE '%{$title}%' /*\$wgDBTableOptions*/"
-		//        );
-		return true;
-	}
-
-	/**
-	 * Called when the administrator runs MediaWiki's update.php script. Creates the required database table which
-	 * EImage needs to cache metadata.
-	 *
-	 * @param DatabaseUpdater $updater
-	 * @return bool Always true.
-	 */
-	public static function createTables( DatabaseUpdater $updater ) {
-	// 1.39 Table with info about external image sources by ID identified – not used for now
-	//        global $wgEImageTableName;
-	//        $base = dirname( __FILE__ ) . '/../schema';
-	//        $updater->addExtensionTable( $wgEImageTableName, "{$base}/create_table.sql" );
-		return true;
-	}
-
-	/**
 	 * In order to avoid having the MediaWiki parser double-parse the output of EImage, we encode the output during
 	 * processing and then have the parser decode the output at the end.
 	 *

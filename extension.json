@@ -1,6 +1,6 @@
 {
 	"name": "EImage",
-	"version": "3.0",
+	"version": "3.3",
 	"author": [
 		"[http://www.robpol86.com/index.php/User:Robpol86 Robert Pooley]",
 		"[https://www.mediawiki.org/wiki/m:User:Want Aleš Kapica]"
@@ -25,25 +25,42 @@
 			"value": true,
 			"description": "By default searched info about image files in local repository"
 		},
-		"EImageExpirationTime": {
-			"value": 1,
-			"description": "After query actualize EImage time milestone for objects in local repository – default is one day (1)"
+		"EImageCache": {
+			"description": "DB table 'ei_cache' has info about files in storages",
+			"value": {
+				"expire" : 3600,
+				"threshold" : 10,
+				"path" : "eimage",
+				"storage" : null
+			}
 		},
-		"EImageNoCache": {
-			"value": false,
-			"description": "True disable using DB local cache and repository for images"
+		"EImageExif": {
+			"value": {
+				"shell" : "/usr/sh",
+				"app" : "exiftool",
+				"environment" : [],
+				"tags" : {
+					"SourceFile" : true,
+					"FileName" : true,
+					"Directory": true,
+					"FilePermissions" : true,
+					"ExifToolVersion" : true
+				}
+			},
+			"description": "If installed exiftool, you can insert or modify exif tags of the files from local storages"
 		},
-		"EImageUseExiftool": {
-			"value": true,
-			"description": "By default searched info about image files in local repository"
+		"EImageQRcode": {
+			"value": {
+				"app" : "/usr/bin/qrencode",
+				"format" : "SVG",
+				"foreground" : "ffffff",
+				"backgground" : "ffffff"
+			},
+			"description": "If installed qrencode, you can generated QR code image to page from wikitext"
 		},
 		"EImageStaleMinutes": {
 			"value": 60,
 			"description": "Refresh cached metadata if the stored entry is this many minutes old"
-		},
-		"EImageTableName": {
-			"value": "eimage_metadata_cache",
-			"description": "Name table in DB for cache of the images presented by EImage"
 		},
 		"EImageEmptyPng": {
 			"value": "empty.png",
@@ -55,7 +72,7 @@
 		"ParserClearState": "EImageHooks::onParserClearState",
 		"ParserOutputPostCacheTransform": "EImageStatic::decode",
 		"ArticlePurge": "EImageStatic::purge",
-		"LoadExtensionSchemaUpdates": "EImageStatic::createTables"
+		"LoadExtensionSchemaUpdates": "EImageHooks::createTable"
 	},
 	"AutoloadClasses": {
 		"EImageHooks": "includes/EImageHooks.php",

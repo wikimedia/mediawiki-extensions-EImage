@@ -1,0 +1,90 @@
+[
+	{
+		"name": "ei_cache",
+		"columns": [
+			{
+				"name": "ei_id",
+				"comment": "Primary key",
+				"type": "integer",
+				"options": { "autoincrement": true, "notnull": true, "unsigned": true }
+			},
+			{
+				"name": "ei_eid",
+				"type": "binary",
+				"options": { "notnull": true, "length": 255, "default": "" }
+			},
+			{
+				"name": "ei_file",
+				"comment": "Name file (sha1sum)",
+				"type": "binary",
+				"options": { "notnull": false, "length": 255 }
+			},
+			{
+				"name": "ei_origin_exif",
+				"comment": "Exif tags of original source as JSON",
+				"type": "blob",
+				"options": { "notnull": false }
+			},
+			{
+				"name": "ei_counter",
+				"comment": "If item visited more threshold value change storage location.",
+				"type": "integer",
+				"options": { "notnull": true, "default": 0 }
+			},
+			{
+				"name": "ei_width",
+				"comment": "If item exists need not open file for width value.",
+				"type": "integer",
+				"options": { "notnull": true, "default": 0 }
+			},
+			{
+				"name": "ei_height",
+				"comment": "If item exists need not open file for height value.",
+				"type": "integer",
+				"options": { "notnull": true, "default": 0 }
+			},
+			{
+				"name": "ei_actor",
+				"comment": "ID of the first creator item. If exists.",
+				"type": "bigint",
+				"options": { "notnull": true, "unsigned": true, "default": 0 }
+			},
+			{
+				"name": "ei_ctime",
+				"comment": "Event timestamp",
+				"type": "mwtimestamp",
+				"options": { "notnull": true }
+			},
+			{
+				"name": "ei_expire",
+				"comment": "Expire timestamp",
+				"type": "mwtimestamp",
+				"options": { "notnull": true }
+			},
+			{
+				"name": "ei_type",
+				"comment": "MimeType identifiers: JPG, PNG, GIF",
+				"type": "mwtinyint",
+				"options": { "notnull": true, "unsigned": true, "length": 3, "default": 0 }
+			}
+		],
+		"indexes": [
+			{
+				"name": "ei_expire_time",
+				"columns": [ "ei_expire" ],
+				"unique": false
+			},
+			{
+				"name": "ei_eid_create",
+				"columns": [ "ei_eid", "ei_ctime" ],
+				"unique": false
+			},
+			{
+				"name": "ei_eid_expire",
+				"columns": [ "ei_eid", "ei_expire" ],
+				"unique": false
+			}
+		],
+		"pk": [ "ei_id" ]
+	}
+]

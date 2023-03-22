@@ -18,203 +18,6 @@ class EImageStaticDiv {
 	const ERR_NOT_EXIST = null;
 	const ERR_UNKNOWN_VALUE = 0;
 
-	// čas vytvoření
-	private $eiTimeOg;
-	// private integer $eiTimeOg;
-	// čas kontroly
-	private integer $eiTimeLu;
-	//
-	private $eiImage;
-	// hodnota ei_articles obsahuje serializované pole všech old_id,
-	// kde se vyskytne stejná hodnota #eimg:obrazek.jpg,
-	// a zároveň řetězec pro akci crop
-	private $eiArticles;
-	// východí šířka - není-li uvedena, načítá se z obrázku (exif)
-	private $eiWidth;
-	// hash?
-	private $eiFilename;
-	//
-	private $eiTitle;
-	// serializované pole exif tagů
-	private $eiComment;
-	//
-	private $eiImgurl;
-	// název souboru v úložišti
-	private $eiImgurlfs;
-	//
-	private $eiImgurlpage;
-	//
-	private $eiErrormsg;
-
-	// function __construct() {
-	//	$this->eiTimeOg = new DateTimeImmutable();
-	//    }
-
-	/**
-	 * Dotaz do databáze, jestli už náhodou objekt neexistuje
-	 * https://www.mediawiki.org/wiki/Manual:Database_access
-	 *
-	 * @param array $parameters
-	 * @return bool
-	 */
-	private static function eimageRequest( $parameters ) {
-		$loadbalancer = MediaWikiServices::getInstance()->getDBLoadBalancer();
-		$dbrequest = $loadbalancer->getConnectionRef( DB_PRIMARY );
-
-		$result = $dbrequest->newSelectQueryBuilder()
-				->select( [ 'ei_image', 'ei_width' ] )
-				->from( 'eimage_metadata_cache' )
-				->where( "ei_width > 0" )
-				->caller( __METHOD__ )
-				->fetchResultSet();
-
-		foreach ( $result as $row ) {
-			// print 'Category ' . $row->cat_title . ' contains ' . $row->cat_pages . " entries.\n";
-			// print '<-- ' . print_r($row) . ' -->';
-		}
-		// // zpracování dotazu
-		//		foreach ( $result as $row ) {
-		//			print $row->pole;
-		//			}
-		return true;
-	}
-
-	/**
-	 * Čas po kterém bude potřeba udělat kontrolu existence
-	 *
-	 * @param int $time Timestamp of the creation
-	 * @return int Timestamp of the expiration
-	 */
-	private static function expirationTime( $time ) {
-		global $wgEImageStaleMinutes;
-
-		if ( is_int( $wgEImageStaleMinutes ) ) {
-			$expire = $time + ( $wgEImageStaleMinutes * 60 );
-		} else {
-			$expire = $expire + 3600;
-		}
-		return $expire;
-	}
-
-	/**
-	 * Zapíše info o vygenerovaném obrázku do tabulky
-	 *
-	 * @param array $parameters
-	 * @return bool
-	 */
-	private static function eimageInsertItem( $parameters ) {
-		// čas vytvoření
-		$eiTimeOg = date_timestamp_get( date_create() );
-		$eiTimeLu = self::expirationTime( $eiTimeOg );
-		// jméno - md5sum kombinace + md5sum šířky + md5sum crop
-		print '<!-- ' . $eiTimeOg . ' – ' . $eiTimeLu . ' -->';
-		print '<!-- ' . print_r( $parameters ) . ' -->';
-		// lokální url (pokud existuje)
-		// exif ? načíst jen pokud se změní čas vytvoření souboru
-		// parametry
-		return true;
-	}
-
-	/**
-	 * Vrací cestu do keše vygenerovaných obrázků
-	 *
-	 * @return bool
-	 */
-	private static function getPath() {
-		return true;
-	}
-
-	/**
-	 * Zakládá repozitář obrázků
-	 */
-	private static function eimageStorage() {
-		global $wgEImageFSRepos;
-
-		$repository = self::getFileRepo( $wgEImageFSRepos['eimagecache'] );
-		$path = $repository->getZonePath( 'public' ) . '/' . self::getPath();
-	}
-
-	/**
-	 * Vygeneruje do repozitáře obrázek dle zadaných parametrů
-	 *
-	 * @param array $parameters
-	 * @return bool
-	 */
-	private static function eimageCreate( $parameters ) {
-		// tady bude kód, který řešil php skript crop.php
-		// …
-		// po vygenerování souboru zapíše info o souboru do tabulky
-		if ( self::eimageInsertItem( $parameters ) ) {
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Vygeneruje do repozitáře obrázek dle zadaných parametrů
-	 *
-	 * @param array|null $parameters
-	 * @return bool
-	 */
-	private static function eimageFileExist( $parameters = null ) {
-		// pokud soubor existuje, zaktualizuje v tabulce čas expirace
-		return false;
-	}
-
-	/**
-	 * zjistí, je-li v repozitáři obrázek dle zadaných parametrů
-	 *
-	 * @param array|null $parameters
-	 * @return bool
-	 */
-	private static function eimageTest( $parameters = null ) {
-		// udělá md5sum
-		// 1, zkontroluje je-li soubor v databázi
-		if ( self::eimageRequest( $parameters ) ) {
-			// 1a, pokud je, ověří jeho existenci
-			if ( self::eimageFileExist( $parameters ) ) {
-				return true;
-			} else {
-				// 1b, pokud není, tak ho vytvoří
-				// znovu, pokud od času vytvoření
-				// uplynula určitá doba
-				self::eimageCreate( $parameters );
-			}
-		} else {
-			// 2, pokud je v databázi, ale na disku není, vrátí
-			//// false. Pokud je, nebo ho nechá vytvořit, vrátí Array
-			/// // Vrátí-li pouze true, požadavek na vytvoření se zatím zpracovává
-			self::eimageCreate( $parameters );
-		}
-		return true;
-	}
-
-	/**
-	 * @param array $info
-	 * @return FileRepo
-	 */
-	public static function getFileRepo( $info ) {
-		$repoName = $info['name'];
-		$directory = $info['directory'];
-		// MediaWiki 1.34+
-		$lockManagerGroup = MediaWikiServices::getInstance()
-			->getLockManagerGroupFactory()
-			->getLockManagerGroup( WikiMap::getCurrentWikiId() );
-		$info['backend'] = new FSFileBackend( [
-			'name' => $repoName . '-backend',
-			'wikiId' => WikiMap::getCurrentWikiId(),
-			'lockManager' => $lockManagerGroup->get( 'fsLockManager' ),
-			'containerPaths' => [
-				"{$repoName}-public" => "{$directory}",
-				"{$repoName}-temp" => "{$directory}/temp",
-				"{$repoName}-thumb" => "{$directory}/thumb",
-			],
-			'fileMode' => 0644,
-			'tmpDirectory' => wfTempDir()
-			] );
-		return new FileRepo( $info );
-	}
-
 /*
 	Argumenty jsou předávané jako Array, kde
 	- [0] je objekt funkce (cesta k obrázku)
@@ -232,39 +35,31 @@ class EImageStaticDiv {
 		2a, parametr title nikdy nebude delší než těch 255 znaků
 		2b, parametr crop také nebude delší
 
-	ei_imgulrfs hash souboru v úložišti
-
 	3, při kontrole existence se zkontroluje čas expirace, na základě md5sumu se vytáhne serializované pole kde [0] bude  enkodovaný přes base64 tabulce text, vyhledá
 
-*/
-/*
-	// dotaz na obrázek
-	if ( self::eimageRequest() ) {
-		return 'záznam existuje';
-	} else {
-		if ( self::eimageCreate() ) {
-		return 'obrázek byl vytvořen';
-		} else {
-		return 'obrázek se nepodařilo vytvořit';
-		}
-	}
-//	return false;
-*/
-
-/* Pole $properties funguje podobně jako fungovalo u šablon Image a block
+	Pole $properties funguje podobně jako fungovalo u šablon Image a block
 	Poziční parametry
 		0 – zdroj obrázku
 		1 - šířka bloku v procentech
 		2 - zbylý obsah – ten ale může obsahovat další kód,
 
 	Pozn.:
-		* Je-li zdroj obrázku none, zpracuje se jako volný blok a do keše se nic nezapisuje
-		* Je-li zdroj obrázek, zapíše se do keše a obrázek se použije jao pozadí
+		* Je-li zdroj obrázku none, zpracuje se obsah jako volný blok a do keše se nic nezapisuje
+		* Je-li zdroj obrázek, zapíše se do keše a použije se jako pozadí
 
 	Pojmenované parametry
-		crop - výřez
+		crop - výřez (EImageIMG)
+		link - aktivní odkaz (EImageIMG)
+		resize - lupa
 		width - výchozí šířka bloku (nepovinný)
 		align - zarovnání
+		absolute - pozicování
+		border
+		class
+		color
+		page
+		alt
+		id
 */
 
 	/**
@@ -375,6 +170,10 @@ class EImageStaticDiv {
 					$string = trim( substr( strstr( $arg, '=' ), 1 ) );
 					$object->attribute['name']['resize'] = $string;
 					continue 2;
+				case 'link':
+					$string = trim( substr( strstr( $arg, '=' ), 1 ) );
+					$object->attribute['name']['location'] = $string;
+					continue 2;
 			}
 			if ( in_array( $arg, [ 'absolute', 'relative' ] ) ) {
 				$object->attribute['name']['position'] = $arg;
@@ -408,7 +207,7 @@ class EImageStaticDiv {
 	 * @return string
 	 */
 	public static function block( Parser $parser, PPFrame $frame, $args ) {
-		$object = new EImageBOX();
+		$object = new EImageBOX;
 		$block = self::parameterParser( $parser, $frame, $args, $object );
 		// $div = new EImageQR();
 		// $div->content = $parameters['content'];
@@ -436,12 +235,13 @@ class EImageStaticDiv {
 	public static function image( Parser $parser, PPFrame $frame, $args ) {
 		$object = new EImageIMG;
 		$image = self::parameterParser( $parser, $frame, $args, $object );
-		$image->setCssString( "position:relative" );
-		if ( !$image->testImg() ) {
-			// Funkce #eimg s parametrem none, nebo bez obrázku nemůže být prezentována jako obrázek
-			return self::ERR_NONE_IMG;
-		}
-		return $image->getHtml();
+		//$image->setCssString( "position:relative" );
+		$image->setCrop( $image->attribute['name']['crop'] );
+		$image->setLocation( $image->attribute['name']['location'] );
+		$image->setSource( $image->attribute['index'][0] );
+		$image->setSourceWidth( $image->attribute['name']['width'] );
+		$image->getPath();
+		return 'ENCODED_EIMAGE_CONTENT ' . base64_encode( $image->getHtml() ) . ' END_ENCODED_EIMAGE_CONTENT';
 	}
 
 	/**
@@ -464,16 +264,6 @@ class EImageStaticDiv {
 		// <div title="I AM HELLO WORLD">HELLO WORLD</div>
 		//	echo '<!-- ' . print_r($properties) . ' -->';
 		return $parameters['type'];
-	}
-
-	/**
-	 * Get thumbnail by width, what is input for action crop
-	 *
-	 * @param string $url
-	 * @return bool file (DBKey)
-	 */
-	private static function imageCrop( $url ) {
-		return true;
 	}
 
 }
