@@ -5,7 +5,6 @@
  * be found in the LICENSE.txt file.
  */
 
-use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 
 class EImageIMG extends EImageBOX {
@@ -53,26 +52,6 @@ class EImageIMG extends EImageBOX {
 	const ERR_INVALID_TITLE = 'eimage-invalid-title';
 	const ERR_NOT_EXIST = null;
 	const ERR_UNKNOWN_VALUE = 0;
-	const E_WARNING = 'eimage-invalid-source';
-
-	/**
-	 * Version for cache invalidation.
-	 */
-	private const CACHE_VERSION = 1;
-
-	/**
-	 * Cache expiry time for the LilyPond version
-	 */
-	private const VERSION_TTL = 3600;
-
-	/**
-	 * FileBackend instance cache
-	 */
-	private static $backend;
-
-	function addCount() {
-		$this->counter =+ 1;
-	}
 
 	function getStyle() {
 		return implode( $this->style );
@@ -85,7 +64,7 @@ class EImageIMG extends EImageBOX {
 	public function cssImage() {
 		if ( $this->imagecontent ) {
 			$params = getimagesizefromstring( base64_decode( $this->imagecontent ) );
-			$mime = [ NULL, 'jpeg', 'gif', 'png' ];
+			$mime = [ null, 'jpeg', 'gif', 'png' ];
 			$this->style[] = "background-image:url(data:image/" . $mime[ $this->dbmimetype ] . ";base64," . $this->imagecontent . ");";
 		}
 	}
@@ -102,10 +81,11 @@ class EImageIMG extends EImageBOX {
 			->firejailDefaultSeccomp();
 	}
 
-	/* DATABASE METHODS */
 	/**
+	 * DATABASE METHODS
 	 * Insert new item into the database
-	 * @ return int
+	 *
+	 * @return integer
 	 */
 	function dbAddItem() {
 		$dbw = wfGetDB( DB_PRIMARY );
@@ -125,28 +105,33 @@ class EImageIMG extends EImageBOX {
 		$this->id = $this->id ?: $dbw->insertId(); // set for accessors
 		return $this->id;
 	}
+
 	/**
 	 * Vytáhne všechny expirované záznamy, u kterých nedosáhl count prahové hodnoty
 	 * a ty odstraní z databáze
 	 */
 	function dbCleanExpiredItems() {
 		// TODO
-		return;
 	}
+
 	/**
 	 * Projede seznam uložených souborů a ty, pro které nenajde žádný záznam v databázi
 	 * odstraní
 	 */
 	function dbCleanOrphanedItems() {
 		// TODO
-		return;
 	}
+
 	/**
 	 * Delete item form the database by id
-	 * @ return bool
+	 *
+	 * @param integer
+	 * @return bool
 	 */
-	function dbDeleteItem( $id = NULL ) {
-		if ( is_null( $id ) ) return false;
+	function dbDeleteItem( $id = null ) {
+		if ( !$id ) {
+			return false;
+		}
 		$dbw = wfGetDB( DB_PRIMARY );
 		$dbw->delete( 'ei_cache',
 			[ 'ei_id' => $id ],
@@ -154,10 +139,11 @@ class EImageIMG extends EImageBOX {
 			);
 		return true;
 	}
+
 	/**
 	 * Try get item from the database by the eid string
 	 *
-	 * @ return int
+	 * @return boolean
 	 */
 	function dbGetItem() {
 		$dbw = wfGetDB( DB_PRIMARY );
@@ -183,29 +169,33 @@ class EImageIMG extends EImageBOX {
 			$this->width = $row->ei_width;
 			$this->height = $row->ei_height;
 			$this->expire = $row->ei_expire;
-			switch ($row->ei_type) {
-				case 1 : $this->mime = 'image/jpeg';
+			switch ( $row->ei_type ) {
+			case 1 : $this->mime = 'image/jpeg';
 					$this->dbmimetype = 1;
-					$this->imgStorage = $this->getCacheLocal ( $this->image . $this->suffix[1] );
+					$this->imgStorage = $this->getCacheLocal( $this->image . $this->suffix[1] );
 					break;
-				case 2 : $this->mime = 'image/gif';
+			case 2 : $this->mime = 'image/gif';
 					$this->dbmimetype = 2;
-					$this->imgStorage = $this->getCacheLocal ( $this->image . $this->suffix[2] );
+					$this->imgStorage = $this->getCacheLocal( $this->image . $this->suffix[2] );
 					break;
-				case 3 : $this->mime = 'image/png';
+			case 3 : $this->mime = 'image/png';
 					$this->dbmimetype = 3;
-					$this->imgStorage = $this->getCacheLocal ( $this->image . $this->suffix[3] );
+					$this->imgStorage = $this->getCacheLocal( $this->image . $this->suffix[3] );
 					break;
-				default : $this->mime = NULL;
-					$this->dbmimetype = NULL;
+			default : $this->mime = null;
+					$this->dbmimetype = null;
 					break;
 			}
 		}
 		return true;
 	}
+
 	/**
 	 * Insert new item into the database
-	 * @ return bool
+	 *
+	 * @param integer
+	 * @param string
+	 * @return bool
 	 */
 	function dbSetExpirationTime( $count, $eid ) {
 		global $wgEImageCache;
@@ -239,6 +229,7 @@ class EImageIMG extends EImageBOX {
 		}
 		return self::ERR_UNKNOWN_VALUE;
 	}
+
 	/**
 	 * Get EXIF metadata from file
 	 *
@@ -248,7 +239,7 @@ class EImageIMG extends EImageBOX {
 	 * @return string
 	 */
 	public static function eimageExif( $parser, $name = '', $meta = '' ) {
-		global $wgEImageExif;
+		// global $wgEImageExif;
 		$file = self::eimageTitleResolve( $name );
 		if ( $file instanceof File ) {
 			$parser->getOutput()->addImage( $file->getTitle()->getDBkey() );
@@ -294,11 +285,12 @@ class EImageIMG extends EImageBOX {
 					}
 */
 					break;
-				}
+			}
 			return $meta;
 		}
 		return self::ERR_NOT_EXIST;
 	}
+
 	/**
 	 * Function to get the height of the image.
 	 *
@@ -313,6 +305,7 @@ class EImageIMG extends EImageBOX {
 		}
 		return self::ERR_UNKNOWN_VALUE;
 	}
+
 	/**
 	 * Function to get the path of the image.
 	 *
@@ -327,6 +320,7 @@ class EImageIMG extends EImageBOX {
 		}
 		return self::ERR_NOT_EXIST;
 	}
+
 	/**
 	 * Get the MIME type of a file
 	 *
@@ -341,6 +335,7 @@ class EImageIMG extends EImageBOX {
 		}
 		return self::ERR_NOT_EXIST;
 	}
+
 	/**
 	 * Get the number of pages of a file
 	 *
@@ -359,6 +354,7 @@ class EImageIMG extends EImageBOX {
 		}
 		return self::ERR_NOT_EXIST;
 	}
+
 	/**
 	 * Get the size of a file
 	 *
@@ -373,6 +369,7 @@ class EImageIMG extends EImageBOX {
 		}
 		return self::ERR_NOT_EXIST;
 	}
+
 	/**
 	 * Convert a string title into a File, returning an appropriate
 	 * error message string if this is not possible
@@ -411,6 +408,7 @@ class EImageIMG extends EImageBOX {
 		}
 		return self::ERR_INVALID_TITLE;
 	}
+
 	/**
 	 * Function to get the width of the image.
 	 *
@@ -455,31 +453,31 @@ class EImageIMG extends EImageBOX {
 		$params = getimagesizefromstring( $original );
 		$width = intval( $params[0] );
 		$height = intval( $params[1] );
-		$draft = imagecreatefromstring($original);
+		$draft = imagecreatefromstring( $original );
 		// Resize podle parametru width=
 		if ( $iw > 0 ) {
-			//echo "Scale before crop by default width {$iw}";
+			// echo "Scale before crop by default width {$iw}";
 			$resampled = imagescale( imagecreatefromstring( $original ), $iw, -1, IMG_BICUBIC_FIXED );
 		}
 		/* $this->original is over */
-		unset($original);
-		//echo "{$this->getName()} :  {$params['mime']}; width: {$width}px; height: {$height}px;\n";
+		unset( $original );
+		// echo "{$this->getName()} :  {$params['mime']}; width: {$width}px; height: {$height}px;\n";
 		if ( $cw == 0 ) {
 			/* Original without resize */
-			if ( isset($resampled) ) {
+			if ( isset( $resampled ) ) {
 				return $this->exportNewImage( $params['mime'], $resampled );
 			} else {
 				return $this->exportNewImage( $params['mime'], $draft );
 			}
 		} else {
 			// CROP
-			if ( isset($resampled) ) {
-				$image_c = imagecrop( $resampled, [ 'x' => abs($cx), 'y' => abs($cy), 'width' => $cw, 'height' => $ch ] );
+			if ( isset( $resampled ) ) {
+				$image_c = imagecrop( $resampled, [ 'x' => abs( $cx ), 'y' => abs( $cy ), 'width' => $cw, 'height' => $ch ] );
 			} else {
 				// Rozměry nového obrázku s posunem
 				$image_p = imagecreatetruecolor( $width, $height );
 				// Naplácnutí posunutého obsahu na obrázek o původní velikosti
-				imagecopyresampled( $image_p, $draft, abs($cx), abs($cy), 0, 0, $width, $height, $width, $height );
+				imagecopyresampled( $image_p, $draft, abs( $cx ), abs( $cy ), 0, 0, $width, $height, $width, $height );
 				$image_c = imagecrop( $image_p, [ 'x' => 0, 'y' => 0, 'width' => $cw, 'height' => $ch ] );
 				// Výřez z posunutého obrázku
 				imagedestroy( $image_p );
@@ -488,15 +486,15 @@ class EImageIMG extends EImageBOX {
 		// …a přeškálování
 		if ( isset( $resize ) ) {
 			// Změna velikost
-			if ( $resize > 3 &&  $resize < 0.01 ) {
-				die('Minimal value of the resize is 0.01 and max 3') ;
+			if ( $resize > 3 && $resize < 0.01 ) {
+				die( 'Minimal value of the resize is 0.01 and max 3' );
 			}
 			// Vypočítanou hodnotu je třeba zaokrouhlit na celé pixely
 			$neww = round( $cw * $resize );
 			$newh = round( $ch * $resize );
 			// echo "Rescale after crop to {$neww}x{$newh} by resize ${resize}\n";
 			// Zmenšení obrázku podle nastaveného poměru
-			$image_r = imagecreatetruecolor( $neww , $newh );
+			$image_r = imagecreatetruecolor( $neww, $newh );
 			imagecopyresampled( $image_r, $image_c, 0, 0, 0, 0, $neww, $newh, $cw, $ch );
 			imagedestroy( $image_c );
 			$draft = $image_r;
@@ -510,27 +508,27 @@ class EImageIMG extends EImageBOX {
 	/**
 	 * Write resource as image by mimetype
 	 *
-	 * @param string $mimetype
+	 * @param string mimetype
 	 * @param resource $image
-	 * @param string $path to file
+	 * @param string path to file
 	 * @return mixed
 	 */
 	function exportNewImage( $mime, $image ) {
 		global $wgEImageExif;
 		$name = $this->getName();
-		$path = tempnam( sys_get_temp_dir(), "FOO");
-		switch ($mime) {
-			case 'image/jpeg' : imagejpeg( $image, $path );
+		$path = tempnam( sys_get_temp_dir(), "FOO" );
+		switch ( $mime ) {
+		case 'image/jpeg' : imagejpeg( $image, $path );
 				$this->dbmimetype = 1;
 				break;
-			case 'image/gif' : imagegif( $image, $path );
+		case 'image/gif' : imagegif( $image, $path );
 				$this->dbmimetype = 2;
 				break;
-			case 'image/png' : imagepng( $image, $path );
+		case 'image/png' : imagepng( $image, $path );
 				$this->dbmimetype = 3;
 				break;
-			}
-		imagedestroy($image);
+		}
+		imagedestroy( $image );
 		if ( $wgEImageExif ) {
 			/* Tahle část nastaví nové parametry pro exif tagy */
 			$this->setNewExif();
@@ -594,22 +592,37 @@ class EImageIMG extends EImageBOX {
 		}
 		return false;
 	}
+
 	/**
 	 * Push content into path
 	 * @return bool
 	 */
 	function pushContent() {
-		return file_put_contents( $this->imgStorage, base64_decode ( $this->imagecontent ) );
+		return file_put_contents( $this->imgStorage, base64_decode( $this->imagecontent ) );
 	}
 
-
+	/**
+	 * Get string fro crop attribute
+	 *
+	 * @return string
+	 */
 	function getCropInfo() {
 		$crop = '';
-		if ( $this->cx ) $crop .= strval( $this->cx );
-		if ( $this->cy ) $crop .= ' ' . strval( $this->cy );
-		if ( $this->cw ) $crop .= ' ' . strval( $this->cw );
-		if ( $this->ch ) $crop .= ' ' . strval( $this->ch );
-		if ( $this->resize ) $crop .= ' ' . strval( $this->resize );
+		if ( $this->cx ) {
+			$crop .= strval( $this->cx );
+		}
+		if ( $this->cy ) {
+			$crop .= ' ' . strval( $this->cy );
+		}
+		if ( $this->cw ) {
+			$crop .= ' ' . strval( $this->cw );
+		}
+		if ( $this->ch ) {
+			$crop .= ' ' . strval( $this->ch );
+		}
+		if ( $this->resize ) {
+			$crop .= ' ' . strval( $this->resize );
+		}
 		return $crop;
 	}
 
@@ -627,7 +640,6 @@ class EImageIMG extends EImageBOX {
 	 * na základě parametrů znovu.
 	 */
 	function getFileFromStorageBySum() {
-		return;
 	}
 
 	/**
@@ -638,7 +650,6 @@ class EImageIMG extends EImageBOX {
 	 * Pokud tam není, je nutné zkontrolovat lokální úložiště
 	 */
 	function getFileFromTempBySum() {
-		return;
 	}
 
 	// vrací název souboru vykuchaný z $this->imgSource
@@ -670,6 +681,8 @@ class EImageIMG extends EImageBOX {
 	 * set path into 'originalsource' property of the object EImageIMG
 	 * and return to next reworking.
 	 * It's first function for call, if you want rework content image
+	 *
+	 * @return string or boolean
 	 */
 	function getOriginalContent() {
 		// 1. načteme obsah ze vzdáleného zdroje
@@ -678,7 +691,9 @@ class EImageIMG extends EImageBOX {
 		} else {
 			$content = file_get_contents( $this->local );
 		}
-		if ( $content === false ) return false;
+		if ( $content === false ) {
+			return false;
+		}
 		// 2. protože nedošlo k selhání, můžu nastavit pracovní adresář,
 		//    nastavit cestu a uložit data do souboru original
 		$this->originalsource = base64_encode( $content );
@@ -691,11 +706,15 @@ class EImageIMG extends EImageBOX {
 	 * in the 'exif' property of the object EImageIMG. And return this array
 	 * to rework.
 	 * Call it only after getOriginalContent()
+	 *
+	 * @return boolean
 	 */
 	function getOriginalExif() {
 		global $wgEImageExif;
 		// Zpracování exif tagů může být vypnuto..
-		if ( ! $wgEImageExif ) return;
+		if ( !$wgEImageExif ) {
+			return false;
+		}
 		$command = self::BoxedCommand()
 			->routeName( 'eimage-exif' );
 		$result = $command
@@ -742,14 +761,14 @@ class EImageIMG extends EImageBOX {
 	 * @return string
 	 */
 	function getPath() {
-		global $wgEImageCache, $wgLocalFileRepo;
+		global $wgEImageCache;
 		$this->setEid();
 		if ( $wgEImageCache ) {
 			$this->dbGetItem();
 			if ( $this->id ) {
 				if ( $this->getContent() ) {
-					//if ( $this->counter < $wgEImageCache['threshold'] ) {
-					//}
+					// if ( $this->counter < $wgEImageCache['threshold'] ) {
+					// }
 					$this->dbSetExpirationTime( $this->counter + 1, $this->eid );
 					$this->cssImage();
 					$this->style[] = "width: {$this->cw}px;";
@@ -763,11 +782,11 @@ Bude se muset se muset generovat znovu a tím pádem se změní i jeho jméno ID
 				}
 			}
 		}
-		//echo "Stáhnu originál\n";
+		// echo "Stáhnu originál\n";
 		$this->getOriginalContent();
-		//echo "Načtu z něj původné exif tagy\n";
+		// echo "Načtu z něj původné exif tagy\n";
 		$this->getOriginalExif();
-		//echo "A jdu na ořez\n";
+		// echo "A jdu na ořez\n";
 		$this->crop();
 		if ( $wgEImageCache ) {
 			// Přidávám položku do databáze
@@ -798,18 +817,20 @@ Bude se muset se muset generovat znovu a tím pádem se změní i jeho jméno ID
 		return $this->imgSource;
 	}
 
-	/* STORAGES */
 	/**
-	 * Return path to the local storage of files
-	 * @return string
+	 * STORAGE
+	 * Path of the source file from local cache
+	 *
+	 * @param string name based on sha1 sum and mimetype of the file
+	 * @return string path to the local storage of files
 	 */
 	function getCacheLocal( $string = '' ) {
 		global $wgLocalFileRepo, $wgEImageCache;
 		$cache = $wgLocalFileRepo['directory'] . DIRECTORY_SEPARATOR . $wgEImageCache['path'];
 		// mode 755 is need for www access
-		if ( ! is_dir( $cache ) ) mkdir( $cache, 0755, true );
+		if ( !is_dir( $cache ) ) mkdir( $cache, 0755, true );
 		if ( $string ) {
-			$this->imgStorage = $cache . DIRECTORY_SEPARATOR . $string ;
+			$this->imgStorage = $cache . DIRECTORY_SEPARATOR . $string;
 			return $this->imgStorage;
 		} else {
 			return $cache;
@@ -817,7 +838,8 @@ Bude se muset se muset generovat znovu a tím pádem se změní i jeho jméno ID
 	}
 
 	/**
-	 * Vrací typ tohoto objektu
+	 * Type of this object
+	 * @return string type
 	 */
 	function getType() {
 		return $this->type;
@@ -850,41 +872,54 @@ Bude se muset se muset generovat znovu a tím pádem se změní i jeho jméno ID
 	}
 
 	/**
-	 * Set width and height of the crop area (in pixels).
 	 * Parameters are parts of the EImageIMG object ID.
 	 *
-	 * @param string
+	 * @param string width and height of the crop area (in pixels)
 	 */
 	function setArea( $string = '' ) {
 		$area = explode( ' ', trim( preg_replace( '/[\t\n\r\s]+/', ' ', $string ) ) );
-		if ( isset( $area[0] ) ) $this->cw = $area[0];
-		if ( isset( $area[1] ) ) $this->ch = $area[1];
+		if ( isset( $area[0] ) ) {
+			$this->cw = $area[0];
+		}
+		if ( isset( $area[1] ) ) {
+			$this->ch = $area[1];
+		}
 	}
 
 	/**
-	 * Left-top corner is the zero point for shift of the crop area.
 	 * Parameters are parts of the EImageIMG object ID.
 	 *
-	 * @param string
+	 * @param string left-top corner is the zero point for shift of the crop area
 	 */
 	function setAxes( $string = '' ) {
 		$axes = explode( ' ', trim( preg_replace( '/[\t\n\r\s]+/', ' ', $string ) ) );
-		if ( isset( $axes[0] ) ) $this->cx = $axes[0];
-		if ( isset( $axes[1] ) ) $this->cy = $axes[1];
+		if ( isset( $axes[0] ) ) {
+			$this->cx = $axes[0];
+		}
+		if ( isset( $axes[1] ) ) {
+			$this->cy = $axes[1];
+		}
 	}
 
 	/**
-	 * Settings for crop can be set by one string.
 	 * Parameters are parts of the EImageIMG object ID.
 	 *
-	 * @param string
+	 * @param string value from crop attribute
 	 */
 	function setCrop( $string = '' ) {
 		$crop = explode( ' ', trim( preg_replace( '/[\t\n\r\s]+/', ' ', $string ) ) );
-		if ( isset( $crop[0] ) ) $this->cx = "{$crop[0]}";
-		if ( isset( $crop[1] ) ) $this->cy = "{$crop[1]}";
-		if ( isset( $crop[2] ) ) $this->cw = "{$crop[2]}";
-		if ( isset( $crop[3] ) ) $this->ch = "{$crop[3]}";
+		if ( isset( $crop[0] ) ) {
+			$this->cx = "{$crop[0]}";
+		}
+		if ( isset( $crop[1] ) ) {
+			$this->cy = "{$crop[1]}";
+		}
+		if ( isset( $crop[2] ) ) {
+			$this->cw = "{$crop[2]}";
+		}
+		if ( isset( $crop[3] ) ) {
+			$this->ch = "{$crop[3]}";
+		}
 		if ( isset( $crop[4] ) ) {
 			$this->resize = "{$crop[4]}";
 		} else {
@@ -901,6 +936,8 @@ Bude se muset se muset generovat znovu a tím pádem se změní i jeho jméno ID
 
 	/**
 	 * EImage image as active link
+	 *
+	 * @param string URL of target
 	 */
 	function setLocation( $string = '' ) {
 		global $wgScript;
@@ -908,7 +945,7 @@ Bude se muset se muset generovat znovu a tím pádem se změní i jeho jméno ID
 		$this->style[] = "cursor:pointer;";
 		if ( substr( $string, 0, 4 ) == 'http' ) {
 			$this->onclick = "window.location.href='{$string}'";
-		} elseif ( substr( $string, 0, 1 ) == '#' )  {
+		} elseif ( substr( $string, 0, 1 ) == '#' ) {
 			$this->onclick = "window.location.href='{$string}'";
 		} else {
 			$this->onclick = "window.location.href='{$wgScript}/{$string}'";
@@ -916,50 +953,56 @@ Bude se muset se muset generovat znovu a tím pádem se změní i jeho jméno ID
 	}
 
 	/**
-	 * Resize value of the cropped area
 	 * Parameter is part of the EImageIMG object ID.
 	 *
-	 * @param string
+	 * @param string resize value of the cropped area
 	 */
 	function setResize( $string = '' ) {
 		$this->resize = trim( $string );
 	}
 
 	/**
-	 * URL, path or name of the image
 	 * Parameter is part of the EImageIMG object ID.
 	 *
-	 * @param string
+	 * @param string URL, path or name of the source image
+	 * @return boolean
 	 */
 	function setSource( $string = '' ) {
-		if ( empty($string) ) return false;
+		if ( empty( $string ) ) {
+			return false;
+		}
 		if ( substr( $string, 0, 4 ) !== 'http' ) {
 			$this->imgSource = str_replace( ' ', '_', $string );
 		} else {
 			$this->imgSource = $string;
 		}
 		$this->getOrigin();
+		return true;
 	}
 
 	/**
-	 * EImage image as alternative text
+	 * EImage content as alternative text
+	 *
+	 * @param string the last item from  attributes
 	 */
 	function setTitle( $string = '' ) {
 		$this->title = $string;
 	}
 
 	/**
-	 * Value of the width for default image
+	 * Basic width of the original source image
 	 *
-	 * @param string
+	 * @param string width from attributes
 	 */
 	function setSourceWidth( $string = '' ) {
 		$this->iw = trim( $string );
 	}
+	
 	// Vrací aktuální hodnotu výchozí šířky
 	function getSourceWidth() {
 		return $this->iw;
 	}
+	
 	// Vrací šířku výřezu
 	function getWidthClip() {
 		return $this->cw;

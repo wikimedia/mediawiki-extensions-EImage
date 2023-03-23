@@ -5,8 +5,6 @@
  * be found in the LICENSE.txt file.
  */
 
-use MediaWiki\MediaWikiServices;
-
 class EImageStaticDiv {
 
 	/**
@@ -235,7 +233,7 @@ class EImageStaticDiv {
 	public static function image( Parser $parser, PPFrame $frame, $args ) {
 		$object = new EImageIMG;
 		$image = self::parameterParser( $parser, $frame, $args, $object );
-		//$image->setCssString( "position:relative" );
+		// $image->setCssString( "position:relative" );
 		$image->setCrop( $image->attribute['name']['crop'] );
 		$image->setLocation( $image->attribute['name']['location'] );
 		$image->setSource( $image->attribute['index'][0] );

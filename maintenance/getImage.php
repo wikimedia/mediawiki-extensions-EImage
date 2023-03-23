@@ -11,9 +11,9 @@
  * @ingroup Maintenance
  */
 if ( getenv( 'MW_INSTALL_PATH' ) ) {
-        $IP = getenv( 'MW_INSTALL_PATH' );
+	$IP = getenv( 'MW_INSTALL_PATH' );
 } else {
-        $IP = __DIR__ . '/../../..';
+	$IP = __DIR__ . '/../../..';
 }
 
 $path = '../../..';
@@ -24,13 +24,7 @@ if ( getenv( 'MW_INSTALL_PATH' ) !== false ) {
 
 require_once $path . '/maintenance/Maintenance.php';
 
-//use MWException;
-use MediaWiki\MediaWikiServices;
-use MediaWiki\Extension\EImage;
-// kvůli dekódování json výstupu z nástroje exiftool;
-use MediaWiki\Json\JsonUnserializer;
-
-class getImage extends Maintenance {
+class GetImage extends Maintenance {
 	public function __construct() {
 		parent::__construct();
 		$this->addOption( 'image', 'Image for rework', true, true );
@@ -75,7 +69,7 @@ https://www.mediawiki.org/wiki/Manual:BoxedCommand
 	public function execute() {
 		$image = new EImageIMG;
 		// Vyplivnutí verze
-		//echo $image->getExiftoolVersion();
+		// echo $image->getExiftoolVersion();
 
 		if ( $this->getOption( 'crop' ) ) {
 			$image->setCrop( $this->getOption( 'crop' ) );
@@ -83,15 +77,17 @@ https://www.mediawiki.org/wiki/Manual:BoxedCommand
 			$image->setAxes( $this->getOption( 'XY' ) );
 			$image->setArea( $this->getOption( 'area' ) );
 		}
-		if ( $this->getOption( 'width' ) ) $image->setSourceWidth( $this->getOption( 'width' ) );
+		if ( $this->getOption( 'width' ) ) {
+			$image->setSourceWidth( $this->getOption( 'width' ) );
+		}
 		$image->setSource( $this->getOption( 'image' ) );
 		return $image->getPath();
-//		$image->cssImage();
+		// $image->cssImage();
 		echo "Done\n";
-		return;
+		return true;
 	}
 
 }
 
-$maintClass = getImage::class;
+$maintClass = GetImage::class;
 require_once RUN_MAINTENANCE_IF_MAIN;

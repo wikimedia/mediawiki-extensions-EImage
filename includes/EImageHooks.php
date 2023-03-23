@@ -55,7 +55,7 @@ class EImageHooks {
 	 */
 	public static function createTable( DatabaseUpdater $updater ) {
 		global $wgEImageCache;
-		if ( ! $wgEImageCache ) {
+		if ( !$wgEImageCache ) {
 			// DatabaseUpdater does not support other databases, so skip
 			return;
 		}
