@@ -1,6 +1,6 @@
 {
 	"name": "EImage",
-	"version": "3.3",
+	"version": "3.4",
 	"author": [
 		"[http://www.robpol86.com/index.php/User:Robpol86 Robert Pooley]",
 		"[https://www.mediawiki.org/wiki/m:User:Want Aleš Kapica]"
@@ -20,6 +20,15 @@
 	"ExtensionMessagesFiles": {
 		"EImageMagick": "EImage.i18n.magic.php"
 	},
+	"AutoloadNamespaces": {
+		"MediaWiki\\Extension\\EImage\\": "includes/"
+	},
+	"SpecialPages": {
+		"EImagePages": {
+			"class": "MediaWiki\\Extension\\EImage\\SpecialEImagePages",
+			"services" : []
+		}
+	},
 	"config": {
 		"EImageOnlyLocalSource": {
 			"value": true,
@@ -34,11 +43,18 @@
 				"storage" : null
 			}
 		},
+		"EImageDjVu": {
+			"value": {
+				"editor" : "djvused",
+				"app" : "ddjvu",
+				"netpbm" : "pnmtojpeg",
+				"use" : false
+			},
+			"description": "Application djvused get info about the selected page and ddjvu (Debian package djvulibre-bin) export cropped clip as bitmap file into PNM, which netpbm tool pnmtojpeg convert into JPEG."
+		},
 		"EImageExif": {
 			"value": {
-				"shell" : "/usr/sh",
 				"app" : "exiftool",
-				"environment" : [],
 				"tags" : {
 					"SourceFile" : true,
 					"FileName" : true,
@@ -47,7 +63,36 @@
 					"ExifToolVersion" : true
 				}
 			},
-			"description": "If installed exiftool, you can insert or modify exif tags of the files from local storages"
+			"description": "If installed exiftool, you can insert or modify exif tags of the files from local storages."
+		},
+		"EImagePdf": {
+			"value": {
+				"app" : "pdftocairo",
+				"use" : false
+			},
+			"description": "Application pdftocairo (Debian package poppler-utils), is conversion tool PDF into SVG, with a crop area support."
+		},
+		"EImageSvg": {
+			"value": {
+				"shell" : "/usr/sh",
+				"app" : "cairosvg",
+				"environment" : [],
+				"use" : false
+			},
+			"description": "Application cairosvg (Debian package cairosvg), convert SVG into PDF"
+		},
+		"EImageAvif": {
+			"value": {
+				"shell" : "/usr/sh",
+				"app" : "heif-enc",
+				"environment" : [],
+				"use" : false
+			},
+			"description": "If installed heif-enc (Debian package libheif-examples, you can use for output bitmap images new format AV1 (avif)"
+		},
+		"EImageImgElement": {
+			"value": true,
+			"description": "If false, class EImageIMG not use element img, but div and image set as background"
 		},
 		"EImageQRcode": {
 			"value": {
@@ -78,6 +123,7 @@
 		"EImageHooks": "includes/EImageHooks.php",
 		"EImageBOX": "includes/EImageBOX.php",
 		"EImageIMG": "includes/EImageIMG.php",
+		"EImageINFO": "includes/EImageINFO.php",
 		"EImageQR": "includes/EImageQR.php",
 		"EImageData": "includes/EImageData.php",
 		"EImageQuery": "includes/EImageQuery.php",

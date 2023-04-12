@@ -79,64 +79,62 @@ class EImageStaticDiv {
 					$string = trim( substr( strstr( $arg, '=' ), 1 ) );
 					// Přiřazení dalších CSS tříd, mimo výchozí
 					$class = $object->getProperty( 'class' );
-					$object->attribute['name']['class'] = $string;
 					$object->setProperty( 'class', $class . ' ' . $string );
 					continue 2;
 				case 'id':
 					$string = trim( substr( strstr( $arg, '=' ), 1 ) );
 					// Nastavení identifikátoru bloku (id=)
 					$object->attribute['name']['id'] = $string;
-					$object->setProperty( 'id', $string );
 					continue 2;
 				case 'alt':
 					$string = trim( substr( strstr( $arg, '=' ), 1 ) );
-					$object->attribute['name']['alt'] = $string;
-					$object->setProperty( 'title', $string );
+					$object->attribute['name']['title'] = $string;
 					continue 2;
 				case 'absolute':
 				case 'relative':
 					$array = preg_split( "/[\s,=]+/", $arg );
 					// nastavení parametrů pro absolutní umístění
 					$object->attribute['name'][$array[0]] = trim( substr( strstr( $arg, '=' ), 1 ) );
-
-					$object->addCssString( "position:{$array[0]}" );
-					// nastavení parametrů pro absolutní umístění
-					// top, left, width, height, z-index
-					// 0    0     0 (dynamická šířka) 0 (dynamická výška) 0 (neřešit)
+					$object->style[] = "position:{$array[0]};";
+					/*
+					 nastavení parametrů pro absolutní umístění
+					 top, left, width, height, z-index
+					 0    0     0 (dynamická šířka) 0 (dynamická výška) 0 (neřešit)
+					*/
 					if ( isset( $array[1] ) ) {
-						$object->addCssString( "left:{$array[1]}" );
+						$object->style[] = "left:{$array[1]};";
 					}
 					if ( isset( $array[2] ) ) {
-						$object->addCssString( "top:{$array[2]}" );
+						$object->style[] = "top:{$array[2]};";
 					}
 					if ( isset( $array[3] ) ) {
 						if ( $array[3] != '0' ) {
-							$object->addCssString( "width:{$array[3]}" );
+							$object->style[] = "width:{$array[3]};";
 						}
 					}
 					if ( isset( $array[4] ) ) {
 						if ( $array[4] != '0' ) {
-							$object->addCssString( "height:{$array[4]}" );
+							$object->style[] = "height:{$array[4]};";
 						}
 					}
 					if ( isset( $array[5] ) ) {
 						if ( $array[5] != '0' ) {
-							$object->addCssString( "right:${array[5]}" );
+							$object->style[] = "right:{$array[5]};";
 						}
 					}
 					if ( isset( $array[6] ) ) {
 						if ( $array[6] != '0' ) {
-							$object->addCssString( "bottom:{$array[6]}" );
+							$object->style[] = "bottom:{$array[6]};";
 						}
 					}
 					if ( isset( $array[7] ) ) {
 						if ( $array[7] != '0' ) {
-							$object->addCssString( "z-index:{$array[7]}" );
+							$object->style[] = "z-index:{$array[7]};";
 						}
 					}
 					if ( isset( $array[8] ) ) {
 						if ( $array[8] != '0' ) {
-							$object->addCssString( "scale:{$array[8]}" );
+							$object->style[] = "scale:{$array[8]};";
 						}
 					}
 					continue 2;
@@ -175,7 +173,11 @@ class EImageStaticDiv {
 			}
 			if ( in_array( $arg, [ 'absolute', 'relative' ] ) ) {
 				$object->attribute['name']['position'] = $arg;
-				$object->addCssString( "position:{$arg}" );
+				$object->style[] = "position:{$arg};";
+				continue;
+			}
+			if ( in_array( $arg, [ 'nocache' ] ) ) {
+				$object->attribute['name']['cache'] = false;
 				continue;
 			}
 			if ( in_array( $arg, [ 'left', 'right', 'center', 'justify', 'underleft', 'underright', 'undercenter', 'inherit' ] ) ) {
@@ -216,7 +218,6 @@ class EImageStaticDiv {
 			// Zpracuje se obrázek na pozadí
 			return Html::noticeBox( "Nejprve je potřeba zpracovat obrázek" . $block->getBackground(), $block );
 		}
-		// return Html::noticeBox( "Aktuální styl: " . $block->getCss() , $block );
 		return $block->getHtml();
 	}
 
@@ -233,12 +234,7 @@ class EImageStaticDiv {
 	public static function image( Parser $parser, PPFrame $frame, $args ) {
 		$object = new EImageIMG;
 		$image = self::parameterParser( $parser, $frame, $args, $object );
-		// $image->setCssString( "position:relative" );
-		$image->setCrop( $image->attribute['name']['crop'] );
-		$image->setLocation( $image->attribute['name']['location'] );
-		$image->setSource( $image->attribute['index'][0] );
-		$image->setSourceWidth( $image->attribute['name']['width'] );
-		$image->getPath();
+		$image->getImage();
 		return 'ENCODED_EIMAGE_CONTENT ' . base64_encode( $image->getHtml() ) . ' END_ENCODED_EIMAGE_CONTENT';
 	}
 

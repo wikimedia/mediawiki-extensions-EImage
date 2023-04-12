@@ -4,18 +4,24 @@
 -- See https://www.mediawiki.org/wiki/Manual:Schema_changes
 CREATE TABLE /*_*/ei_cache (
   ei_id INT UNSIGNED AUTO_INCREMENT NOT NULL,
-  ei_eid VARBINARY(255) DEFAULT '' NOT NULL,
-  ei_file VARBINARY(255) DEFAULT NULL,
+  ei_eid VARBINARY(40) NOT NULL,
+  ei_clip LONGBLOB DEFAULT NULL,
+  ei_file VARBINARY(40) DEFAULT NULL,
   ei_origin_exif LONGBLOB DEFAULT NULL,
   ei_counter INT DEFAULT 0 NOT NULL,
   ei_width INT DEFAULT 0 NOT NULL,
   ei_height INT DEFAULT 0 NOT NULL,
-  ei_actor BIGINT UNSIGNED DEFAULT 0 NOT NULL,
   ei_ctime BINARY(14) NOT NULL,
   ei_expire BINARY(14) NOT NULL,
   ei_type TINYINT(3) UNSIGNED DEFAULT 0 NOT NULL,
   INDEX ei_expire_time (ei_expire),
-  INDEX ei_eid_create (ei_eid, ei_ctime),
-  INDEX ei_eid_expire (ei_eid, ei_expire),
+  UNIQUE INDEX ei_eid_create (ei_eid, ei_file),
   PRIMARY KEY(ei_id)
+) /*$wgDBTableOptions*/;
+
+
+CREATE TABLE /*_*/ei_pages (
+  ei_page INT UNSIGNED NOT NULL,
+  ei_image VARBINARY(40) NOT NULL,
+  UNIQUE INDEX ei_page_image (ei_page, ei_image)
 ) /*$wgDBTableOptions*/;

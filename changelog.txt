@@ -1,3 +1,12 @@
+version 3.4
+* Cache tables 'ei_cache' & 'ei_pages'
+* Supported source file formats:
+ - PNG transparency
+ - SVG and multipage formats DJVU, PDF
+ - Experimental support for avif
+* Special page Special:EImagePages for list clips
+* New class EImageINFO, to get info about pages or the clips
+
 version 3.3
 * Removed unused variables and code.
 * Support for DB scheme in JSON

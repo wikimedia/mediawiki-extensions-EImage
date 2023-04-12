@@ -5,6 +5,13 @@
 		]
 	},
 	"eimage-desc": "Zobrazuje obrázky z jiného serveru tak, jako by byly uploadované do wiki.",
+	"eimagepages": "Výstřižky",
+	"eimagepages-summary": "Výstřižky generuje na základě parametrů on-the-fly funkce <code>#eimg</code>. To sebou pochopitelně nese zvýšené nároky na výpočetní výkon serveru, proto rozšíření EImage umožňuje kešování. Je-li povoleno, uloží se vygenerovaný výstřižek po prvním průchodu do souboru, který funkce <code>#eimg</code> použije při každém dalším – pokud se jeho parametry nezmění. Stejný výstřižek, pokud se parametricky nebude lišit zadání funkce <code>#eimg</code>, je možné použít opakovaně i na jiných stránkách MediaWiki, podporujících zpracování wikitextu.\nTato stránka nabízí přehled existujících výstřižků a odpovídajících parametrů.",
+	"eimagepages-nocache": "Jen málokdy se podaří nastavit parametry výstřižku na první pokus, proto je doporučeno použít v nastavení parametr <code>nocache</code> který zajistí, že se i při zapnutém kešování bude generovat obrázek ''on-the-fly''.",
+	"eimagepages-expire": "Po odstranění parametru <code>nocache</code> se výstřižek uloží do keše a při každém dalším načtení souboru z keše, se automaticky prodluží jeho expirační lhůta. Pokud parametry výstřižku změníte, vygeneruje se výstřižek nový a '''výstřižek, kterému vyprší expirační lhůta se časem automaticky zruší'''. To se může stát i v případě, že jde o výstřižek, který je součástí málo frekventované stránky. Ničemu to nevadí. Bude-li stále dostupný výchozí obrázek, vygeneruje se při načtení stránky výstřižek nový. Problém však může nastat, pokud je zdrojem výstřižku externí zdroj (volaný přes URL). Je zcela běžné, že časem přestane být takový zdroj dostupný. Proto máte k dipozici parametr <code>noexpire</code>, který nastaví datum expirace do daleké budoucnosti.",
+	"eimagepages-column-clip": "Výstřižek",
+	"eimagepages-column-pages": "Použito na stránce",
+	"eimagepages-column-desc": "Atributy",
 	"eimage-invalidimageid": "Neplatné ID obrázku",
 	"eimage-thumbnail-more": "Zvětšit",
 	"eimage-rawmissingwidth": "Obrázek zadaný přes URL musí mít nastavenou šířku.",

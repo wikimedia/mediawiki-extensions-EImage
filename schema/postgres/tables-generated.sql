@@ -4,13 +4,13 @@
 -- See https://www.mediawiki.org/wiki/Manual:Schema_changes
 CREATE TABLE ei_cache (
   ei_id SERIAL NOT NULL,
-  ei_eid TEXT DEFAULT '' NOT NULL,
+  ei_eid TEXT NOT NULL,
+  ei_clip TEXT DEFAULT NULL,
   ei_file TEXT DEFAULT NULL,
   ei_origin_exif TEXT DEFAULT NULL,
   ei_counter INT DEFAULT 0 NOT NULL,
   ei_width INT DEFAULT 0 NOT NULL,
   ei_height INT DEFAULT 0 NOT NULL,
-  ei_actor BIGINT DEFAULT 0 NOT NULL,
   ei_ctime TIMESTAMPTZ NOT NULL,
   ei_expire TIMESTAMPTZ NOT NULL,
   ei_type SMALLINT DEFAULT 0 NOT NULL,
@@ -19,6 +19,11 @@ CREATE TABLE ei_cache (
 
 CREATE INDEX ei_expire_time ON ei_cache (ei_expire);
 
-CREATE INDEX ei_eid_create ON ei_cache (ei_eid, ei_ctime);
+CREATE UNIQUE INDEX ei_eid_create ON ei_cache (ei_eid, ei_file);
 
-CREATE INDEX ei_eid_expire ON ei_cache (ei_eid, ei_expire);
+
+CREATE TABLE ei_pages (
+  ei_page INT NOT NULL, ei_image TEXT NOT NULL
+);
+
+CREATE UNIQUE INDEX ei_page_image ON ei_pages (ei_page, ei_image);

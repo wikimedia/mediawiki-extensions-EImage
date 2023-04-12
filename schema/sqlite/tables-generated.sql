@@ -4,18 +4,22 @@
 -- See https://www.mediawiki.org/wiki/Manual:Schema_changes
 CREATE TABLE /*_*/ei_cache (
   ei_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-  ei_eid BLOB DEFAULT '' NOT NULL, ei_file BLOB DEFAULT NULL,
-  ei_origin_exif BLOB DEFAULT NULL,
+  ei_eid BLOB NOT NULL, ei_clip BLOB DEFAULT NULL,
+  ei_file BLOB DEFAULT NULL, ei_origin_exif BLOB DEFAULT NULL,
   ei_counter INTEGER DEFAULT 0 NOT NULL,
   ei_width INTEGER DEFAULT 0 NOT NULL,
   ei_height INTEGER DEFAULT 0 NOT NULL,
-  ei_actor BIGINT UNSIGNED DEFAULT 0 NOT NULL,
   ei_ctime BLOB NOT NULL, ei_expire BLOB NOT NULL,
   ei_type SMALLINT UNSIGNED DEFAULT 0 NOT NULL
 );
 
 CREATE INDEX ei_expire_time ON /*_*/ei_cache (ei_expire);
 
-CREATE INDEX ei_eid_create ON /*_*/ei_cache (ei_eid, ei_ctime);
+CREATE UNIQUE INDEX ei_eid_create ON /*_*/ei_cache (ei_eid, ei_file);
 
-CREATE INDEX ei_eid_expire ON /*_*/ei_cache (ei_eid, ei_expire);
+
+CREATE TABLE /*_*/ei_pages (
+  ei_page INTEGER UNSIGNED NOT NULL, ei_image BLOB NOT NULL
+);
+
+CREATE UNIQUE INDEX ei_page_image ON /*_*/ei_pages (ei_page, ei_image);

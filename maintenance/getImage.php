@@ -46,43 +46,22 @@ and local absolute path:
 		$this->requireExtension( 'EImage' );
 	}
 
-/*
-	// pro lokální soubory bere pro obrázky plnou cestu od kořene
-	// "/srv/main/wiki/extensions/EImage/empty.png"
-	// pro vzdálené obrázky musí být uvedeno plné url
-	// "https://www.thewoodcraft.org/wiki/images/d/d7/dot.png"
-	isset($query['page'])
-		? $source = 'https://' . $_SERVER[ 'HTTP_HOST' ] . '/wiki/thumb.php?' . http_build_query( array (
-			'f'     => $query['f'],
-			'page'  => $query['page'],
-			'width' => $query['width']
-			) )
-		: $source = 'https://' . $_SERVER[ 'HTTP_HOST' ] . '/wiki/thumb.php?' . http_build_query( array (
-			'f'     => $query['f'],
-			'width' => $query['width']
-		) ) ;
-
-https://www.mediawiki.org/wiki/Manual:BoxedCommand
-
-*/
-
 	public function execute() {
 		$image = new EImageIMG;
 		// Vyplivnutí verze
 		// echo $image->getExiftoolVersion();
 
 		if ( $this->getOption( 'crop' ) ) {
-			$image->setCrop( $this->getOption( 'crop' ) );
+			$image->setEidCrop( $this->getOption( 'crop' ) );
 		} else {
-			$image->setAxes( $this->getOption( 'XY' ) );
-			$image->setArea( $this->getOption( 'area' ) );
+			$image->setEidAxes( $this->getOption( 'XY' ) );
+			$image->setEidArea( $this->getOption( 'area' ) );
 		}
 		if ( $this->getOption( 'width' ) ) {
-			$image->setSourceWidth( $this->getOption( 'width' ) );
+			$image->setEidWidth( $this->getOption( 'width' ) );
 		}
-		$image->setSource( $this->getOption( 'image' ) );
-		return $image->getPath();
-		// $image->cssImage();
+		$image->setEidSource( $this->getOption( 'image' ) );
+		return $image->getImage();
 		echo "Done\n";
 		return true;
 	}

@@ -10,14 +10,21 @@
 			},
 			{
 				"name": "ei_eid",
+				"comment": "Field is sha1 checksum value of the ei_clip field",
 				"type": "binary",
-				"options": { "notnull": true, "length": 255, "default": "" }
+				"options": { "notnull": true, "length": 40 }
+			},
+			{
+				"name": "ei_clip",
+				"comment": "Attributes as JSON, for create of the clip",
+				"type": "blob",
+				"options": { "notnull": false }
 			},
 			{
 				"name": "ei_file",
-				"comment": "Name file (sha1sum)",
+				"comment": "Field is sha1 checksum of the clip content",
 				"type": "binary",
-				"options": { "notnull": false, "length": 255 }
+				"options": { "notnull": false, "length": 40 }
 			},
 			{
 				"name": "ei_origin_exif",
@@ -42,12 +49,6 @@
 				"comment": "If item exists need not open file for height value.",
 				"type": "integer",
 				"options": { "notnull": true, "default": 0 }
-			},
-			{
-				"name": "ei_actor",
-				"comment": "ID of the first creator item. If exists.",
-				"type": "bigint",
-				"options": { "notnull": true, "unsigned": true, "default": 0 }
 			},
 			{
 				"name": "ei_ctime",
@@ -76,15 +77,34 @@
 			},
 			{
 				"name": "ei_eid_create",
-				"columns": [ "ei_eid", "ei_ctime" ],
-				"unique": false
-			},
-			{
-				"name": "ei_eid_expire",
-				"columns": [ "ei_eid", "ei_expire" ],
-				"unique": false
+				"columns": [ "ei_eid", "ei_file" ],
+				"unique": true
 			}
 		],
 		"pk": [ "ei_id" ]
+	},
+	{
+		"name": "ei_pages",
+		"columns": [
+			{
+				"name": "ei_page",
+				"comment": "ID wiki page where is file used",
+				"type": "integer",
+				"options": { "unsigned": true, "length": 10 }
+			},
+			{
+				"name": "ei_image",
+				"comment": "Name file in cache",
+				"type": "binary",
+				"options": { "notnull": true, "length": 40 }
+			}
+		],
+		"indexes": [
+			{
+				"name": "ei_page_image",
+				"columns": [ "ei_page", "ei_image" ],
+				"unique": true
+			}
+		]
 	}
 ]

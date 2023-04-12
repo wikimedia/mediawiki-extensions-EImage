@@ -1,13 +1,19 @@
 {
 	"@metadata": {
 		"authors": [
-			"Robert Pooley",
-			"Aleš Kapica"
+			"Want"
 		]
 	},
-	"eimage-desc": "Display images from image hosting services as if they were stored locally.",
-	"eimage-invalidimageid": "Invalid image ID",
-	"eimage-thumbnail-more": "Enlarge",
-	"eimage-rawmissingwidth": "Using raw URLs requires specifying the width.",
-	"eimage-rawmissingheight": "Using raw URLs requires specifying the height."
+	"eimage-desc": "{{desc|name=EImage|url=https://www.mediawiki.org/wiki/Extension:EImage}}",
+	"eimagepages": "Clips",
+	"eimagepages-summary": "This page is review of the clips, generated the <code>#eimg</code> function. The EImage extension by default allows caching. Mode 'on-the-fly' is supported, but it increased demands on the server's computing power. If cache enabled, is the generated clip saved in the first pass, which used <code>#eimg</code>. For each next pass is used clip from cache, if any base attribut not changed. The clip exists, as long as the <code>#eimg</code> instantion is parametrically same. It can be reused on other place of the MediaWiki article everywhere wikitext supported. This page provides an overview of existing clips and their corresponding parameters.",
+	"eimagepages-nocache": "Only rarely you add the clipping parameters on the first, so is recommended use the attribute <code>nocache</code> to ensure that in the 'on-the-fly' process is caching disabled.",
+	"eimagepages-expire": "After removing the nocache parameter, the clipping is saved to the cache and each time the file is read from the cache, its expiration time is automatically extended. If you change the clipping parameters, a new clipping will be generated and the expired clipping will be automatically discarded over time. This can happen even if the clipping is part of a low-traffic page. It doesn't matter to anyone. If the default image is still available, a new clipping will be generated when the page is loaded. However, a problem may occur if the source of the clipping is an external source (called via a URL). It is quite common for such a source to become unavailable over time. Therefore, you have the noexpire parameter, which sets the expiration date into the distant future.",
+	"eimagepages-column-clip": "Clip",
+	"eimagepages-column-desc": "Attributes",
+	"eimagepages-column-pages": "Used by",
+	"eimage-invalidimageid": "Error message",
+	"eimage-thumbnail-more": "Option",
+	"eimage-rawmissingwidth": "Error when raw URLs don't have the width specified.",
+	"eimage-rawmissingheight": "Error when raw URLs don't have the height specified."
 }
