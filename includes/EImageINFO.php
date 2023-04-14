@@ -20,6 +20,7 @@ class EImageINFO {
 	/**
 	 * Try get item from the database by the md5 hash of file
 	 *
+	 * @param string
 	 * @return mixed Array or false
 	 */
 	public static function dbGetClipInfoByHash( $image ) {
@@ -62,8 +63,31 @@ class EImageINFO {
 	}
 
 	/**
+	 * Try get from the database value of the ei_file field, by ei_eid value
+	 *
+	 * @param string $hash is sha1 checksum of the JSON parameters used to the clip create
+	 * @return string sha1 checksum content of the clip or false
+	 */
+	public static function dbGetHashByHash( $hash ) {
+		$dbw = wfGetDB( DB_PRIMARY );
+		$dbw->startAtomic( __METHOD__ );
+		$result = $dbw->selectField(
+			'ei_cache',
+			'ei_file',
+			[ 'ei_eid' => $hash ],
+			__METHOD__
+			);
+		$dbw->endAtomic( __METHOD__ );
+		if ( $result ) {
+			return $result;
+		}
+		return false;
+	}
+
+	/**
 	 * Try get item from the database by the curid string
 	 *
+	 * @param integer
 	 * @return mixed Array or false
 	 */
 	public static function dbGetPage( $curid ) {
@@ -101,7 +125,7 @@ class EImageINFO {
 	/**
 	 * Try get item from the database by the eid string
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	function dbGetByEid() {
 		$dbw = wfGetDB( DB_PRIMARY );
@@ -140,43 +164,6 @@ class EImageINFO {
 			return false;
 		}
 	}
-
-	/**
-	 * STATIC METHODS
-	 *
-	 * Function to get the width & height of the image.
-	 * Formated as string WxH for using as parameter
-	 * of the 'eimage'
-	 *
-	 * @param Parser $parser Parser object passed a reference
-	 * @param string $name Name of the image being parsed in
-	 * @return string or NULL
-	 */
-	public static function eInfo( $parser, $name = '', $meta = '' ) {
-		$value = strlen( $name );
-		if ( $value == 39 ) {
-			// eid or image hash
-			switch ( $meta ) {
-//			return $file->getWidth() . 'x' . $file->getHeight();
-			default: // file -> výsledkem bude seznam stránek, které s ním pracují
-				// z tabulky 'imagelinks', vytáhne 'il_from' a 'il_from_namespace'
-				break;
-			}
-		} elseif ( $value > 0 ) {
-			// curid
-			$this->id = $name;
-			if ( $this->dbGetPage() ) {
-				switch ( $meta ) {
-				case 'pagename':
-					break;
-				default:
-					break;
-				}
-			}
-		}
-		return self::ERR_UNKNOWN_VALUE;
-	}
-
 
 	function getType() {
 		return $this->type;

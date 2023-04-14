@@ -158,6 +158,9 @@ class EImageStaticDiv {
 					$string = trim( substr( strstr( $arg, '=' ), 1 ) );
 					$object->attribute['name']['color'] = $string;
 					continue 2;
+				case 'padding':
+					$object->attribute['name']['padding'] = trim( substr( strstr( $arg, '=' ), 1 ) );
+					continue 2;
 				case 'rotate':
 					$string = trim( substr( strstr( $arg, '=' ), 1 ) );
 					$object->attribute['name']['rotate'] = $string;
@@ -191,6 +194,7 @@ class EImageStaticDiv {
 		$object->setPercentualWidth();
 		$object->setBorder();
 		$object->setColor();
+		$object->setPadding();
 		$object->setAlign();
 		$object->setRotate();
 		$object->content = $arg;
@@ -209,15 +213,6 @@ class EImageStaticDiv {
 	public static function block( Parser $parser, PPFrame $frame, $args ) {
 		$object = new EImageBOX;
 		$block = self::parameterParser( $parser, $frame, $args, $object );
-		// $div = new EImageQR();
-		// $div->content = $parameters['content'];
-		if ( $block->getBackground() == 'none' ) {
-			// Funkce #eibox s parametrem none, nebo bez obrázku se interpretuje bez obrázku na pozadí
-			// return Html::noticeBox( "Není co kešovat, blok je bez obrázku na pozadí" , $block );
-		} else {
-			// Zpracuje se obrázek na pozadí
-			return Html::noticeBox( "Nejprve je potřeba zpracovat obrázek" . $block->getBackground(), $block );
-		}
 		return $block->getHtml();
 	}
 
@@ -235,7 +230,7 @@ class EImageStaticDiv {
 		$object = new EImageIMG;
 		$image = self::parameterParser( $parser, $frame, $args, $object );
 		$image->getImage();
-		return 'ENCODED_EIMAGE_CONTENT ' . base64_encode( $image->getHtml() ) . ' END_ENCODED_EIMAGE_CONTENT';
+		return EImageIMG::poach( $image->getHtml() );
 	}
 
 	/**

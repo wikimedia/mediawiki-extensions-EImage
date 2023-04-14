@@ -11,11 +11,15 @@ class EImageIMG extends EImageBOX {
 
 	/**
 	 * Nekešované parametry, důležité pro zpracování klipu, které se nikam neukládají
+	 *
+	 * @var bool
 	 */
 	private $cache = true;    // bool kešování obrázku
 
 	/**
 	 * Kešované parametry, důležité pro identifikaci klipu, ukládané do tabulky 'ei_cache' ve formátu JSON
+	 *
+	 * @var mixed
 	 */
 	private $dbmimetype;      // integer id mimetype, pole 'ei_type'
 	private $eid;             // string identifikátor klipu v poli 'ei_eid', je to sha1 checksum obsahu pole 'ei_clip' který lze vytvořit bezprostředně po zpracování vstupních parametrů, před generováním klipu
@@ -38,6 +42,8 @@ class EImageIMG extends EImageBOX {
 
 	/**
 	 * Path of the clip, is set for new clip by method $this->getCacheLocal()
+	 *
+	 * @var string
 	 */
 	public $imgStorage = '.';
 	private $local = 'none';  // string u lokálního souboru vede na lokální soubor
@@ -53,7 +59,6 @@ class EImageIMG extends EImageBOX {
 	private $src;             // string pokud se používá element img, vkládá se obrázek přes atribut src=
 	private $thumbwidth = 180;// výchozí šířka náhledu v pixelech
 	public $newexif = [];     // array
-
 
 	// konstruktor této funkce
 	function __construct() {
@@ -84,6 +89,8 @@ class EImageIMG extends EImageBOX {
 	/**
 	 * Metoda zpracovává bitmapové formáty. Kromě jiného také zajišťuje
 	 * export výřezu z DjVu stránky, který uloží jako bitmapový soubor
+	 *
+	 * @return bool
 	 */
 	function cropDjVuPage() {
 		global $wgEImageDjVu, $wgEImageExif;
@@ -101,7 +108,7 @@ class EImageIMG extends EImageBOX {
 			$getsize = $command->params(
 				$wgEImageDjVu['editor'],
 					'input.djvu',
-					'-e', 'select '. $page . '; size'
+					'-e', 'select ' . $page . '; size'
 					)
 				->inputFileFromString( 'input.djvu', $djvusource )
 				->execute();
@@ -124,9 +131,9 @@ class EImageIMG extends EImageBOX {
 				/* WARNING DjVu zero point is in left-bottom corner */
 				if ( $this->iw > 0 ) {
 					// crop is based on the new default size
-					$scale = (int) round( $this->dpi / $origw * $this->iw );
+					$scale = (int)round( $this->dpi / $origw * $this->iw );
 					$width = $this->iw;
-					$height = (int) round( $this->iw * $origh / $origw );
+					$height = (int)round( $this->iw * $origh / $origw );
 					if ( $this->cw > 0 ) {
 						// crop based on the new size
 						$w = $this->cw;
@@ -134,7 +141,7 @@ class EImageIMG extends EImageBOX {
 						$x = abs( $this->cx );
 						$y = $height - abs( $this->cy ) - $this->ch;
 						if ( ( $width >= ( $w + $x ) ) && ( $y > 0 ) ) {
-							$segment = $w . 'x' . $h . '+' . $x . '+' . $y ;
+							$segment = $w . 'x' . $h . '+' . $x . '+' . $y;
 							$this->iw = $w;
 							$this->ih = $h;
 						} else {
@@ -182,7 +189,7 @@ class EImageIMG extends EImageBOX {
 				$wgEImageDjVu['app'],
 					'-format=pnm',
 					'-page=' . $page,
-					'-scale='. $scale,
+					'-scale=' . $scale,
 					'-segment=' . $segment,
 					'input.djvu'
 					)
@@ -280,6 +287,8 @@ class EImageIMG extends EImageBOX {
 	 * Metoda zpracovává SVG, které konvertuje na PDF ze kterého udělá
 	 * výřez který bude opět v SVG formátu. Jako vstup lze použít i
 	 * vícestránkový PDF soubor
+	 *
+	 * @return bool
 	 */
 	function cropPdfPage() {
 		global $wgEImagePdf, $wgEImageSvg, $wgMetaNamespace;
@@ -308,7 +317,7 @@ class EImageIMG extends EImageBOX {
 			if ( $pdf->getStderr() ) {
 				print_r( $pdf->getExitCode() );
 				print_r( $pdf->getStderr() );
-				unlink ( $tempFilePdf );
+				unlink( $tempFilePdf );
 				return false;
 			}
 		} elseif ( $this->dbmimetype == 5 ) {
@@ -363,15 +372,15 @@ class EImageIMG extends EImageBOX {
 		if ( $svg->getStderr() ) {
 			print_r( $svg->getExitCode() );
 			print_r( $svg->getStderr() );
-			unlink ( $tempFilePdf );
-			unlink ( $tempFileSvg );
+			unlink( $tempFilePdf );
+			unlink( $tempFileSvg );
 			return false;
 		}
 		// remove temporary PDF
 		unlink( $tempFilePdf );
 		/* insert exif tags */
 		$string = file_get_contents( $tempFileSvg );
-		$s = simplexml_load_string( '<metadata></metadata>');
+		$s = simplexml_load_string( '<metadata></metadata>' );
 		$sxe = $s->addChild( 'rdf:RDF' );
 		$work = $sxe->addChild( 'cc:Work' );
 		$format = $work->addChild( 'dc:format', 'image/svg+xml' );
@@ -383,11 +392,11 @@ class EImageIMG extends EImageBOX {
 		$right = $work->addChild( 'dc:right' );
 		$rightagent = $right->addChild( 'cc:Agent' );
 		$copyright = $rightagent->addChild( 'dc:title', '(C) ' . date( "Y", mktime() ) . " ${wgMetaNamespace}" );
-		$urlsource = $work->addChild( 'dc:source', $this->imgSource);
+		$urlsource = $work->addChild( 'dc:source', $this->imgSource );
 		$description = $work->addChild( 'dc:description', $this->title );
 		$contributor = $work->addChild( 'dc:contributor' );
 		$contribagent = $contributor->addChild( 'cc:Agent' );
-		$workedby = $contribagent->addChild('dc:title', "Zpracováno rozšířením {$exifdata['name']} verze {$exifdata['version']}, které naprgal Aleš Kapica - Want" );
+		$workedby = $contribagent->addChild( 'dc:title', "Zpracováno rozšířením {$exifdata['name']} verze {$exifdata['version']}, které naprgal Aleš Kapica - Want" );
 		$m = substr( $s->asXml(), 22 );
 		$content = strstr( $string, '<defs>', true ) . $m . strstr( $string, '<defs>' );
 		/* after write */
@@ -396,21 +405,21 @@ class EImageIMG extends EImageBOX {
 		$this->dbmimetype = 4; // důležitá změna mimetype!!!
 		$svgReader = new SVGReader( $tempFileSvg );
 		$metadata = $svgReader->getMetadata();
-		if ( !isset( $metadata['width'] ) || !isset ( $metadata['height'] ) ) {
+		if ( !isset( $metadata['width'] ) || !isset( $metadata['height'] ) ) {
 			// echo "Problém s načtením SVG souboru\n";
 			return false;
 		} else {
 			// mohu nastavit rozměry $this->iw a $this->ih
 			$this->iw = $this->vectorPixel( $metadata['originalWidth'] )[0];
 			$this->ih = $this->vectorPixel( $metadata['originalHeight'] )[0];
-			//.. a vygenerovat náhled, pokud není $this->cache false
+			// ..a vygenerovat náhled, pokud není $this->cache false
 			if ( $this->cache ) {
-				$dirpath = self::getCacheLocal() . DIRECTORY_SEPARATOR . 'thumbs' ;
+				$dirpath = self::getCacheLocal() . DIRECTORY_SEPARATOR . 'thumbs';
 				if ( !is_dir( $dirpath ) ) {
 					// mode 755 is need for www access
 					mkdir( $dirpath, 0755, true );
 				}
-				$thumbnail = $dirpath .  DIRECTORY_SEPARATOR . $this->image . '.png' ;
+				$thumbnail = $dirpath . DIRECTORY_SEPARATOR . $this->image . '.png';
 				$width = 180;
 				$height = $metadata['height'] / $metadata['width'] * $width;
 				$handler = new SvgHandler;
@@ -472,7 +481,7 @@ class EImageIMG extends EImageBOX {
 		}
 		$resize = floatval( $this->resize ); // přeškálování výřezu; 0.01 < (default 1) < 3
 		$draft = imagecreatefromstring( $original );
-		imagealphablending($draft, false);
+		imagealphablending( $draft, false );
 		// Resize podle parametru width=
 		if ( $this->iw > 0 ) {
 			// echo "Scale before crop by default width {$iw}";
@@ -495,8 +504,8 @@ class EImageIMG extends EImageBOX {
 			} else {
 				// Rozměry nového obrázku s posunem
 				$image_p = imagecreatetruecolor( $this->cw, $this->ch );
-				$black = imagecolorallocate($image_p, 0, 0, 0);
-				imagecolortransparent($image_p, $black);
+				$black = imagecolorallocate( $image_p, 0, 0, 0 );
+				imagecolortransparent( $image_p, $black );
 				// Naplácnutí posunutého obsahu na obrázek o původní velikosti
 				imagecopyresampled( $image_p, $draft, abs( $this->cx ), abs( $this->cy ), 0, 0, $this->cw, $this->ch, $this->cw, $this->ch );
 				$image_c = imagecrop( $image_p, [ 'x' => 0, 'y' => 0, 'width' => $this->cw, 'height' => $this->ch ] );
@@ -516,8 +525,8 @@ class EImageIMG extends EImageBOX {
 			// echo "Rescale after crop to {$neww}x{$newh} by resize ${resize}\n";
 			// Zmenšení obrázku podle nastaveného poměru
 			$image_r = imagecreatetruecolor( $neww, $newh );
-			$black = imagecolorallocate($image_r, 0, 0, 0);
-			imagecolortransparent($image_r, $black);
+			$black = imagecolorallocate( $image_r, 0, 0, 0 );
+			imagecolortransparent( $image_r, $black );
 			imagecopyresampled( $image_r, $image_c, 0, 0, 0, 0, $neww, $newh, $this->cw, $this->ch );
 			imagedestroy( $image_c );
 			$draft = $image_r;
@@ -534,18 +543,18 @@ class EImageIMG extends EImageBOX {
 	 * V obou předchozích případech je návratová hodnota 'true'
 	 * Návratová hodnota 'false' je signál, že klip neexistuje a tudíž ho bude nutné generovat znovu
 	 *
-	 * @param string
-	 * @param boolean
-	 * @return boolean
+	 * @param string $id
+	 * @param bool $create
+	 * @return bool
 	 */
-	function clipThumbnail ( $id, $create = true ) {
+	function clipThumbnail( $id, $create = true ) {
 		$cache = $this->getCacheLocal() . DIRECTORY_SEPARATOR;
 		$d = glob( $cache . $id . '.*', GLOB_BRACE );
 		foreach ( $d as $clip ) {
 			$thumbnail = $cache . 'thumbs' . DIRECTORY_SEPARATOR . $id . '.png';
 			if ( $create ) {
 				if ( !file_exists( $thumbnail ) ) {
-					$this->createThumbnail( $id , base64_encode( file_get_contents( $clip ) ) );
+					$this->createThumbnail( $id, base64_encode( file_get_contents( $clip ) ) );
 				}
 				return true;
 			} else {
@@ -562,17 +571,18 @@ class EImageIMG extends EImageBOX {
 	/**
 	 * Create thumbnail from clip, if cache activate
 	 *
-	 * @param string of the image content base64 encoded
+	 * @param string $id - sha1 checksum of the clip content
+	 * @param string $string of the image content base64 encoded
 	 * @return bool
 	 */
-	public static function createThumbnail( $id,  $string = '' ) {
+	public static function createThumbnail( $id, $string = '' ) {
 		if ( $id ) {
-			$dirpath = self::getCacheLocal() . DIRECTORY_SEPARATOR . 'thumbs' ;
+			$dirpath = self::getCacheLocal() . DIRECTORY_SEPARATOR . 'thumbs';
 			if ( !is_dir( $dirpath ) ) {
 				// mode 755 is need for www access
 				mkdir( $dirpath, 0755, true );
 			}
-			$path = $dirpath .  DIRECTORY_SEPARATOR . $id . '.png' ;
+			$path = $dirpath . DIRECTORY_SEPARATOR . $id . '.png';
 			switch ( substr( $string, 0, 7 ) ) {
 			case 'QVQmVEZ': // djvu
 			case 'JVBERi0': // pdf
@@ -593,7 +603,7 @@ class EImageIMG extends EImageBOX {
 				unset( $string );
 				$svgReader = new SVGReader( $tempFileSvg );
 				$metadata = $svgReader->getMetadata();
-				if ( !isset( $metadata['width'] ) || !isset ( $metadata['height'] ) ) {
+				if ( !isset( $metadata['width'] ) || !isset( $metadata['height'] ) ) {
 					// echo "Problém s načtením SVG souboru\n";
 					unlink( $tempFileSvg );
 					unlink( $tempFilePng );
@@ -609,11 +619,11 @@ class EImageIMG extends EImageBOX {
 						$height
 					);
 					unlink( $tempFileSvg );
-					unlink ( $tempFilePng );
+					unlink( $tempFilePng );
 					unset( $path );
 				}
 				break;
-			default :
+			default:
 				// zatím s tím nic nenadělám
 				break;
 			}
@@ -626,7 +636,7 @@ class EImageIMG extends EImageBOX {
 	 * Return image as base64 string for CSS style
 	 */
 	public function cssImage() {
-		global $wgBaseDirectory, $wgLocalFileRepo, $wgEImageCache, $wgEImageImgElement;
+		global $wgLocalFileRepo, $wgEImageCache, $wgEImageImgElement;
 		if ( $this->imagecontent ) {
 			$params = getimagesizefromstring( base64_decode( $this->imagecontent ) );
 			// prohledávám pole před vložením obrázku
@@ -661,10 +671,12 @@ class EImageIMG extends EImageBOX {
 	 * DATABASE METHODS
 	 * Insert new item into the database
 	 *
-	 * @return integer
+	 * @return int
 	 */
 	function dbAddItem() {
-		if ( $this->cache == false ) return false;
+		if ( $this->cache == false ) {
+			return false;
+		}
 		$dbw = wfGetDB( DB_PRIMARY );
 		$dbw->startAtomic( __METHOD__ );
 		$item = $dbw->selectField(
@@ -701,10 +713,10 @@ class EImageIMG extends EImageBOX {
 	/**
 	 * Odstranění duplicitních záznamů z tabulky 'ei_pages' a vrácení pole unikátních záznamů
 	 *
-	 * @param string - sha1 checksum of the clip (field 'ei_image')
+	 * @param string $id - sha1 checksum of the clip (field 'ei_image')
 	 * @return array
 	 */
-	function dbClipArrayGet ( $id ) {
+	function dbClipArrayGet( $id ) {
 		$dbw = wfGetDB( DB_PRIMARY );
 		$dbw->startAtomic( __METHOD__ );
 		$pages = $dbw->select(
@@ -717,7 +729,7 @@ class EImageIMG extends EImageBOX {
 			return true;
 		}
 		$items = [];
-		foreach( $pages as $p ) {
+		foreach ( $pages as $p ) {
 			// extrakce záznamů
 			$items[] = [ 'ei_page' => $p->ei_page, 'ei_image' => $p->ei_image ];
 		}
@@ -728,7 +740,7 @@ class EImageIMG extends EImageBOX {
 	 * Delete items from table 'ei_pages' by ei_image and 'ei_cache' by ei_file
 	 * Note: Used by maintainer script
 	 *
-	 * @param string
+	 * @param string $id - sha1 checksum of the clip content
 	 * @return bool
 	 */
 	function dbDeleteId( $id ) {
@@ -769,14 +781,16 @@ class EImageIMG extends EImageBOX {
 	/**
 	 * Try get item from the database by the eid string
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	function dbGetClip() {
 		// RequestContext::getMain()->getUser()->getName(); // jméno uživatele
 		// RequestContext::getMain()->getUser()->mId ); // id uživatele
 		// RequestContext::getMain()->getWikiPage()->getId() ); // id aktuální stránky
 		// RequestContext::getMain()->getActionName() ); // aktuální akce
-		if ( !$this->cache ) return false;
+		if ( !$this->cache ) {
+			return false;
+		}
 		$dbw = wfGetDB( DB_PRIMARY );
 		$dbw->startAtomic( __METHOD__ );
 		$result = $dbw->select(
@@ -808,23 +822,29 @@ class EImageIMG extends EImageBOX {
 				$this->ih = $row->ei_height;
 				switch ( $row->ei_type ) {
 				case 1:
-				case 26:  $this->mime = 'image/jpeg';
+				case 26:
+					$this->mime = 'image/jpeg';
 					$this->dbmimetype = 1;
 					$this->imgStorage = $this->getCacheLocal( $this->image . $this->suffix[1] );
 					break;
-				case 2: $this->mime = 'image/gif';
+				case 2:
+					$this->mime = 'image/gif';
 					$this->dbmimetype = 2;
 					$this->imgStorage = $this->getCacheLocal( $this->image . $this->suffix[2] );
 					break;
-				case 3: $this->mime = 'image/png';
+				case 3:
+					$this->mime = 'image/png';
 					$this->dbmimetype = 3;
 					$this->imgStorage = $this->getCacheLocal( $this->image . $this->suffix[3] );
 					break;
-				case 4 :
-				case 20: $this->mime = 'image/svg+xml';
+				case 4:
+				case 20:
+					$this->mime = 'image/svg+xml';
 					$this->dbmimetype = 4;
 					$this->imgStorage = $this->getCacheLocal( $this->image . $this->suffix[4] );
-				default : $this->mime = null;
+					break;
+				default:
+					$this->mime = null;
 					$this->dbmimetype = null;
 					break;
 				}
@@ -841,8 +861,6 @@ class EImageIMG extends EImageBOX {
 	/**
 	 * Insert new item into the database
 	 *
-	 * @param integer
-	 * @param string
 	 * @return bool
 	 */
 	function dbPage() {
@@ -871,13 +889,13 @@ class EImageIMG extends EImageBOX {
 			);
 		}
 		$dbw->endAtomic( __METHOD__ );
+		return true;
 	}
 
 	/**
 	 * Insert new item into the database
 	 *
-	 * @param integer
-	 * @param string
+	 * @param string $eid - sha1 checksum of the atributtes in JSON
 	 * @return bool
 	 */
 	public static function dbSetExpirationTime( $eid ) {
@@ -1022,16 +1040,18 @@ class EImageIMG extends EImageBOX {
 	 * @param string $name File name
 	 * @return string or NULL
 	 */
-	public static function eimageMime( $parser, $name = '' ) {
+	public function eimageMime( $parser, $name = '' ) {
 		$file = self::dbTitleResolve( $name );
 		if ( $file instanceof File ) {
 			$mimetype = $file->getMimeType();
-			switch ($mimetype) {
+			switch ( $mimetype ) {
 			case 'application/xml':
-			case 'image/svg+xml': $this->mime = 4;
+			case 'image/svg+xml':
+				$this->mime = 4;
 				return 'image/svg+xml';
 				break;
-			default: return $mimetype;
+			default:
+				return $mimetype;
 				break;
 			}
 		}
@@ -1129,7 +1149,7 @@ class EImageIMG extends EImageBOX {
 	/**
 	 * Write resource as image by mimetype
 	 *
-	 * @param string mimetype
+	 * @param string $mime mimetype
 	 * @param resource $image
 	 * @param string path to file
 	 * @return mixed
@@ -1139,15 +1159,18 @@ class EImageIMG extends EImageBOX {
 		$name = $this->getName();
 		$path = tempnam( sys_get_temp_dir(), "NEW" );
 		switch ( $mime ) {
-		case 'image/jpeg' : imagejpeg( $image, $path );
-				$this->dbmimetype = 1;
-				break;
-		case 'image/gif' : imagegif( $image, $path );
-				$this->dbmimetype = 2;
-				break;
-		case 'image/png' : imagepng( $image, $path );
-				$this->dbmimetype = 3;
-				break;
+		case 'image/jpeg':
+			imagejpeg( $image, $path );
+			$this->dbmimetype = 1;
+			break;
+		case 'image/gif':
+			imagegif( $image, $path );
+			$this->dbmimetype = 2;
+			break;
+		case 'image/png':
+			imagepng( $image, $path );
+			$this->dbmimetype = 3;
+			break;
 		}
 		imagedestroy( $image );
 		if ( $wgEImageExif ) {
@@ -1192,7 +1215,8 @@ class EImageIMG extends EImageBOX {
 				$command = self::BoxedCommand()
 					->routeName( 'eimage-avif' );
 				switch ( $this->dbmimetype ) {
-				case 1: $resultavif = $command
+				case 1:
+					$resultavif = $command
 					->params(
 						$wgEImageAvif['app'],
 						'-A',
@@ -1206,7 +1230,8 @@ class EImageIMG extends EImageBOX {
 					break;
 				case 2:
 					break;
-				case 3: $resultavif = $command
+				case 3:
+					$resultavif = $command
 					->params(
 						$wgEImageAvif['app'],
 						'-A',
@@ -1254,14 +1279,16 @@ class EImageIMG extends EImageBOX {
 	 * STORAGE
 	 * Method of the cache - return path to the cache directory, or path of the clip
 	 *
-	 * @param string name based on sha1 sum and mimetype of the file
+	 * @param string $string - name based on sha1 sum and mimetype of the file
 	 * @return string path to the local storage of files
 	 */
 	public function getCacheLocal( $string = '' ) {
 		global $wgLocalFileRepo, $wgEImageCache;
 		$cache = $wgLocalFileRepo['directory'] . DIRECTORY_SEPARATOR . $wgEImageCache['path'];
 		// mode 755 is need for www access
-		if ( !is_dir( $cache ) ) mkdir( $cache, 0755, true );
+		if ( !is_dir( $cache ) ) {
+			mkdir( $cache, 0755, true );
+		}
 		if ( $string ) {
 			$this->imgStorage = $cache . DIRECTORY_SEPARATOR . $string;
 			return $this->imgStorage;
@@ -1280,12 +1307,14 @@ class EImageIMG extends EImageBOX {
 			$content = file_get_contents( $this->imgStorage );
 			if ( $content ) {
 				$this->imagecontent = base64_encode( $content );
-				switch( $this->base64id[substr( $this->imagecontent, 0, 7 )] ) {
+				switch ( $this->base64id[substr( $this->imagecontent, 0, 7 )] ) {
 				case 1:
-				case 26: $this->dbmimetype = 1;
+				case 26:
+					$this->dbmimetype = 1;
 					break;
 				case 4:
-				case 20: $this->dbmimetype = 4;
+				case 20:
+					$this->dbmimetype = 4;
 					break;
 				}
 				return true;
@@ -1337,7 +1366,7 @@ class EImageIMG extends EImageBOX {
 	 * Pokud se žádný záznam nevrátí, je to signál že se data teprve budou
 	 * generovat a vrátí cestu do adresáře dočasného úložiště
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	function getImage() {
 		global $wgEImageCache;
@@ -1356,7 +1385,7 @@ class EImageIMG extends EImageBOX {
 			$this->setEidWidth( $this->attribute['name']['width'] );
 		}
 		$this->setEidSource( $this->attribute['index'][0] );
-		$this->setEid();
+		$this->getEid();
 		// Next attributes
 		if ( isset( $this->attribute['name']['location'] ) ) {
 			$this->setLocation( $this->attribute['name']['location'] );
@@ -1373,20 +1402,20 @@ class EImageIMG extends EImageBOX {
 						// ...
 						// a v tomto momentu se rozhoduje co se bude vracet
 						$this->cssImage();
-//						$this->style[] = "width:" . $this->iw . "px;";
-//						$this->style[] = "height:" . $this->ih . "px;";
-////						$this->style[] = "transform: scale(" . $this->width / 100 . "); transform-origin: 0% 0%;" ;
-//		$this->style[] = "transform: scale( " . 100 / $this->iw * ( $this->iw / $this->ih ) * $this->width / 10 . "); transform-origin: 0% 0%;" ;
+						// $this->style[] = "width:" . $this->iw . "px;";
+						// $this->style[] = "height:" . $this->ih . "px;";
+						// $this->style[] = "transform: scale(" . $this->width / 100 . "); transform-origin: 0% 0%;" ;
+						// $this->style[] = "transform: scale( " . 100 / $this->iw * ( $this->iw / $this->ih ) * $this->width / 10 . "); transform-origin: 0% 0%;" ;
 						return true;
 					} else {
-//						echo "Soubor " . $this->name . "s ID " . $this->id ." není nakešován je ptřeba smazet položku";
+						// echo "Soubor " . $this->name . "s ID " . $this->id ." není nakešován je ptřeba smazet položku";
 						// File $this->image not exist in storage, remove orphan item from DB
 						$this->dbDeleteItem();
 						unset( $this->id );
 					}
 				} else {
 					// Object has state 'nocache', before item remove must delete clip
-//					echo "Soubor " . $this->name ."s ID " . $this->id . " je v keši, ale nemá být";
+					// echo "Soubor " . $this->name ."s ID " . $this->id . " je v keši, ale nemá být";
 					$this->dbDeleteItem();
 					unset( $this->id );
 					if ( file_exists( $this->imgStorage ) ) {
@@ -1394,7 +1423,7 @@ class EImageIMG extends EImageBOX {
 					}
 				}
 			} else {
-//			print_r( "Nepodařilo se načíst: " . $this->eid . " - ");
+			// print_r( "Nepodařilo se načíst: " . $this->eid . " - ");
 			}
 		} else {
 			$this->cache = false;
@@ -1427,15 +1456,18 @@ class EImageIMG extends EImageBOX {
 				return false;
 			}
 		case 1:
-		case 26: if ( !$gdtest['JPEG Support'] ) {
+		case 26:
+			if ( !$gdtest['JPEG Support'] ) {
 				// vrátit zprávu o tom, že JPEG formát nemá podporu
 				return false;
 			}
-		case 2: if ( !$gdtest['GIF Create Support'] ) {
+		case 2:
+			if ( !$gdtest['GIF Create Support'] ) {
 				// vrátit zprávu o tom, že GIF formát nemá podporu
 				return false;
 			}
-		case 3: if ( !$gdtest['PNG Support'] ) {
+		case 3:
+			if ( !$gdtest['PNG Support'] ) {
 				// vrátit zprávu o tom, že PNG formát nemá podporu
 				return false;
 			}
@@ -1444,8 +1476,8 @@ class EImageIMG extends EImageBOX {
 		default: // neznámý formát
 			return false;
 		}
-		if ( strlen($this->eid) == 0 ) {
-//print_r('Prázdné eid');
+		if ( strlen( $this->eid ) == 0 ) {
+		// print_r('Prázdné eid');
 		} else {
 			if ( $this->dbAddItem() ) {
 				// Přidávám položku do databáze
@@ -1470,9 +1502,9 @@ class EImageIMG extends EImageBOX {
 		return true;
 	}
 
-
 	/**
 	 * Return mimetype
+	 *
 	 * @return string
 	 */
 	function getMimetype() {
@@ -1507,7 +1539,7 @@ class EImageIMG extends EImageBOX {
 	 * exiftool allowed, convert to array, and set this as
 	 * $this->exif value
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	function getOriginal() {
 		global $wgEImageExif;
@@ -1551,7 +1583,7 @@ class EImageIMG extends EImageBOX {
 			}
 		}
 		$this->originalsource = base64_encode( $content );
-		unset($content);
+		unset( $content );
 		$this->dbmimetype = $this->base64id[ substr( $this->originalsource, 0, 7 ) ];
 		return true;
 	}
@@ -1596,7 +1628,7 @@ class EImageIMG extends EImageBOX {
 	 * Zero values of the height signalize using proportional scale of source
 	 * Default value of the resize is 1 == 100% orginal size
 	 */
-	function setEid() {
+	function getEid() {
 		$this->clip = [
 			'source' => $this->imgSource,
 			'page' => $this->page,
@@ -1606,25 +1638,34 @@ class EImageIMG extends EImageBOX {
 			'cx' => $this->cx,
 			'cy' => $this->cy,
 			'cw' => $this->cw,
-			'ch'=> $this->ch,
+			'ch' => $this->ch,
 			'resize' => $this->resize
 		];
 		$this->eid = sha1( FormatJson::encode( $this->clip, true ) );
-//		$this->eid = sha1( "{$this->imgSource}!{$this->cx} {$this->cy} {$this->cw} {$this->ch}!{$this->resize}!{$this->width}" );
+		// $this->eid = sha1( "{$this->imgSource}!{$this->cx} {$this->cy} {$this->cw} {$this->ch}!{$this->resize}!{$this->width}" );
+	}
+
+	/**
+	 * Set EImage ID to get the exist clip from cache
+	 *
+	 * @param string $hash eid
+	 */
+	public function setEid( $hash ) {
+		$this->eid = $hash;
 	}
 
 	/**
 	 * Parameters are parts of the EImageIMG object ID.
 	 *
-	 * @param string width and height of the crop area (in pixels)
+	 * @param string $string is width and height of the crop area (in pixels)
 	 */
 	function setEidArea( $string = '' ) {
 		$area = explode( ' ', trim( preg_replace( '/[\t\n\r\s]+/', ' ', $string ) ) );
 		if ( isset( $area[0] ) ) {
-			$this->cw = (int) $area[0];
+			$this->cw = (int)$area[0];
 		}
 		if ( isset( $area[1] ) ) {
-			$this->ch = (int) $area[1];
+			$this->ch = (int)$area[1];
 		}
 	}
 
@@ -1636,10 +1677,10 @@ class EImageIMG extends EImageBOX {
 	function setEidAxes( $string = '' ) {
 		$axes = explode( ' ', trim( preg_replace( '/[\t\n\r\s]+/', ' ', $string ) ) );
 		if ( isset( $axes[0] ) ) {
-			$this->cx = (int) $axes[0];
+			$this->cx = (int)$axes[0];
 		}
 		if ( isset( $axes[1] ) ) {
-			$this->cy = (int) $axes[1];
+			$this->cy = (int)$axes[1];
 		}
 	}
 
@@ -1656,16 +1697,16 @@ class EImageIMG extends EImageBOX {
 				$this->attribute['name']['crop'] )
 				) );
 			if ( isset( $crop[0] ) ) {
-				$this->cx = (int) $crop[0];
+				$this->cx = (int)$crop[0];
 			}
 			if ( isset( $crop[1] ) ) {
-				$this->cy = (int) $crop[1];
+				$this->cy = (int)$crop[1];
 			}
 			if ( isset( $crop[2] ) ) {
-				$this->cw = (int) $crop[2];
+				$this->cw = (int)$crop[2];
 			}
 			if ( isset( $crop[3] ) ) {
-				$this->ch = (int) $crop[3];
+				$this->ch = (int)$crop[3];
 			}
 			if ( isset( $crop[4] ) ) {
 				$this->resize = $crop[4];
@@ -1681,20 +1722,20 @@ class EImageIMG extends EImageBOX {
 	function setEidPage() {
 		if ( isset( $this->attribute['name']['page'] ) ) {
 			$this->page = $this->attribute['name']['page'];
-		};
+		}
 	}
 
 	/**
 	 * Parameter is part of the EImageIMG object ID.
 	 *
-	 * @param string URL, path or name of the source image
-	 * @return boolean
+	 * @param string $string is URL, path or name of the source image
+	 * @return bool
 	 */
 	function setEidSource( $string = '' ) {
 		if ( empty( $string ) ) {
 			if ( isset( $this->parameters['index'][0] ) ) {
 				$string = $this->parameters['index'][0];
-			};
+			}
 		}
 		if ( substr( $string, 0, 4 ) !== 'http' ) {
 			$this->imgSource = str_replace( ' ', '_', $string );
@@ -1715,7 +1756,7 @@ class EImageIMG extends EImageBOX {
 				$string = $this->attribute['name']['width'];
 			}
 		}
-		$this->iw = (int) trim( $string );
+		$this->iw = (int)trim( $string );
 	}
 
 	/**
@@ -1728,7 +1769,7 @@ class EImageIMG extends EImageBOX {
 	/**
 	 * EImage image as active link
 	 *
-	 * @param string URL of target
+	 * @param string $string is URL of the target
 	 */
 	function setLocation( $string = '' ) {
 		global $wgScript;
@@ -1748,7 +1789,6 @@ class EImageIMG extends EImageBOX {
 		if ( is_numeric( $this->attribute['index'][1] ) ) {
 			$this->width = $this->attribute['index'][1];
 		}
-		return;
 	}
 
 	/**
@@ -1781,7 +1821,7 @@ class EImageIMG extends EImageBOX {
 	 * Parameters are parts of the EImageIMG object ID.
 	 *
 	 */
-// Tuhle funkci je třeba volat po načtení souboru
+	// Tuhle funkci je třeba volat po načtení souboru
 	function setOrigSize() {
 		$crop = explode( ' ', trim( preg_replace( '/[\t\n\r\s]+/', ' ', $string ) ) );
 		if ( isset( $crop[0] ) ) {
@@ -1803,11 +1843,10 @@ class EImageIMG extends EImageBOX {
 		}
 	}
 
-
 	/**
 	 * Parameter is part of the EImageIMG object ID.
 	 *
-	 * @param string resize value of the cropped area
+	 * @param string $string is resize value of the cropped area
 	 */
 	function setResize( $string = '' ) {
 		$this->resize = trim( $string );
@@ -1816,7 +1855,7 @@ class EImageIMG extends EImageBOX {
 	/**
 	 * EImage content as alternative text
 	 *
-	 * @param string the last item from  attributes
+	 * @param string $string is the last item from the set of attributes
 	 */
 	function setTitle( $string = '' ) {
 		$this->title = $string;
@@ -1827,23 +1866,29 @@ class EImageIMG extends EImageBOX {
 	 * @return array (float, typ)
 	 */
 	public static function vectorPixel( $string = '' ) {
-		switch( substr($string, -2) ) {
-		case 'pt': $rozmer = floatval( substr( $string, 0, -2 ) ) * 1.333333333; // vypočtený rozměr v pixelech
+		switch ( substr($string, -2) ) {
+		case 'pt':
+			$rozmer = floatval( substr( $string, 0, -2 ) ) * 1.333333333; // vypočtený rozměr v pixelech
 			$jednotka = 'pt';
 			break;
-		case 'px': $rozmer = floatval( substr( $string, 0, -2 ) );
+		case 'px':
+			$rozmer = floatval( substr( $string, 0, -2 ) );
 			$jednotka = 'px';
 			break;
-		case 'mm': $rozmer = floatval( substr( $string, 0, -2 ) ) * 3.78; // vypočtený rozměr v pixelech
+		case 'mm':
+			$rozmer = floatval( substr( $string, 0, -2 ) ) * 3.78; // vypočtený rozměr v pixelech
 			$jednotka = 'mm';
 			break;
-		case 'in': $rozmer = floatval( substr( $string, 0, -2 ) ) * 96; // vypočtený rozměr v pixelech
+		case 'in':
+			$rozmer = floatval( substr( $string, 0, -2 ) ) * 96; // vypočtený rozměr v pixelech
 			$jednotka = 'in';
 			break;
-		case 'pc': $rozmer = floatval( substr( $string, 0, -2 ) ) * 16; // vypočtený rozměr v pixelech
+		case 'pc':
+			$rozmer = floatval( substr( $string, 0, -2 ) ) * 16; // vypočtený rozměr v pixelech
 			$jednotka = 'pc';
 			break;
-		default: $rozmer = floatval( $string ); // je to jen číslo
+		default:
+			$rozmer = floatval( $string ); // je to jen číslo
 			$jednotka = '';
 			break;
 		}

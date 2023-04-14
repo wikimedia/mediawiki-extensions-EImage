@@ -29,6 +29,7 @@ class EImageBOX {
 	 *
 	 *    $this->base64id[ substr( $string, 0, 7 ) ]
 	 *
+	 * @var array
 	 */
 	public $base64id = [
 		'Qk3qewc' => 0, // bmp
@@ -52,7 +53,7 @@ class EImageBOX {
 		'AAAAIGZ' => 18, // mp4
 		'PG1lZGl' => 19, // xml (mediawiki)
 		'PD94bWw' => 20, // xml (api)
-		'PGV4cG9' => 21, //xml (database)
+		'PGV4cG9' => 21, // xml (database)
 		'PD9waHA' => 22, // script (php)
 		'IyEvYml' => 23, // script (/bin/bash)
 		'IyEgL2J' => 24, // script (/bin/sh)
@@ -71,6 +72,7 @@ class EImageBOX {
 	 *
 	 *    $this->suffix[ $this->dbmimetype ]
 	 *
+	 * @var array
 	 */
 	public $suffix = [
 		0 => '.bmp',
@@ -113,6 +115,7 @@ class EImageBOX {
 	 *
 	 *    $this->suffix[ $this->dbmimetype ]
 	 *
+	 * @var array
 	 */
 	public $mimetype = [
 		0 => 'image/bmp',
@@ -205,6 +208,13 @@ class EImageBOX {
 		}
 	}
 
+	// Vnitřní odsazení 'padding='
+	function setPadding() {
+		if ( isset( $this->attribute['name']['padding'] ) ) {
+			$this->style[] = "padding:{$this->attribute['name']['padding']};";
+		}
+	}
+
 	// Natočení boxu 'rotate='
 	function setRotate() {
 		if ( isset( $this->attribute['name']['rotate'] ) ) {
@@ -280,6 +290,7 @@ class EImageBOX {
 					break;
 				case 'center':
 					$this->style[] = "display:block;";
+					$this->style[] = "margin:15px auto 15px auto;";
 					break;
 				case 'undercenter':
 					$this->style[] = "display:block;";
@@ -289,27 +300,9 @@ class EImageBOX {
 		}
 	}
 
-	// obrázek na pozadí
-	function getBackground() {
-		if ( empty( $this->bgSource ) ) {
-			if ( isset( $this->attribute['index'][0] ) ) {
-				$this->bgSource = $this->attribute['index'][0];
-				if ( $this->bgSource == 'none' ) {
-					// nastavit pozadí bez obrázku
-				} else {
-					// Otestovat zdroj obrázku true pokud existuje
-				}
-			} else {
-				$this->bgSource = 'none';
-			}
-		} else {
-			$this->bgSource = 'none';
-		}
-		return $this->bgSource;
-	}
-
 	// vrací div, s obrázkem na pozadí o rozměrech onoho obrázku
 	function getHtml() {
+		global $wgLocalFileRepo, $wgEImageCache;
 		if ( $this->property['class'] ) {
 			$params['class'] = $this->property['class'];
 		}
@@ -319,12 +312,59 @@ class EImageBOX {
 		if ( isset( $this->attribute['name']['title'] ) ) {
 			$params['title'] = $this->attribute['name']['title'];
 		}
+		if ( isset( $this->attribute['index'][0] ) ) {
+			// Na pozadí může být obrázek adresovaný přes plné URL, cestu, název, eid hash nebo náhled identifikovaný přes sha1 checksum
+			if ( ( $this->attribute['index'][0] !== 'none' ) && ( !empty( $this->attribute['index'][0] ) ) ) {
+				$i = substr( $this->attribute['index'][0], 0, 1 );
+				switch ( $i ) {
+				case 'h': // URL začíná vždy h
+					$content = file_get_contents( $this->attribute['index'][0] );
+					$bgsize = getimagesizefromstring( $content );
+					$this->style[] = self::poach( "min-height: ". $bgsize[1] . "px;background-image:url(data:" . $bgsize['mime'] . ";base64," . base64_encode( $content ) . ");background-repeat: no-repeat; background-position: top left;" );
+					break;
+				case '/':
+					$content = file_get_contents( $wgLocalFileRepo['directory'] . $this->attribute['index'][0] );
+					$bgsize = getimagesizefromstring( $content );
+					$this->style[] = self::poach( "min-height: ". $bgsize[1] . "px;background-image:url(data:" . $bgsize['mime'] . ";base64," . base64_encode( $content ) . ");background-repeat: no-repeat; background-position: top left;" );
+					break;
+				default: // hash clipu nikdy nezačíná písmenem h
+					$hash = EImageINFO::dbGetHashByHash( $this->attribute['index'][0] );
+					if ( $hash ) {
+						// ei_eid
+						$clip = new EImageIMG;
+						$clip->setEid( $this->attribute['index'][0] );
+						$clip->dbGetClip();
+						$content = file_get_contents( $clip->imgStorage );
+						$bgsize = getimagesizefromstring( $content );
+						// clip on background
+						$this->style[] = self::poach( "min-height: ". $bgsize[1] . "px;background-image:url(data:" . $bgsize['mime'] . ";base64," . base64_encode( $content ) . ");background-repeat: no-repeat; background-position: top left;" );
+					} else {
+						// ei_file
+						$content = file_get_contents( $wgLocalFileRepo['directory'] . DIRECTORY_SEPARATOR . $wgEImageCache['path'] . DIRECTORY_SEPARATOR . 'thumbs' . DIRECTORY_SEPARATOR . $this->attribute['index'][0] . '.png' );
+						$bgsize = getimagesizefromstring( $content );
+						// thumbnail on background - it use special page
+						$this->style[] = self::poach( "min-height: ". $bgsize[1] . "px;background-image:url(data:" . $bgsize['mime'] . ";base64," . base64_encode( $content ) . ");background-repeat: no-repeat; background-position: top left;" );
+					}
+					break;
+				}
+			}
+		}
 		$params['style'] = $this->getStyle();
 		return Html::rawElement( 'div', $params, $this->content );
 	}
 
 	function getStyle() {
 		return implode( $this->style );
+	}
+
+	/**
+	 * Ochranný obal před sanitizací MW
+	 *
+	 * @param string $string
+	 * @return string
+	 */
+	public static function poach( $string ) {
+		return 'ENCODED_EIMAGE_CONTENT ' . base64_encode( $string ) . ' END_ENCODED_EIMAGE_CONTENT';
 	}
 
 }

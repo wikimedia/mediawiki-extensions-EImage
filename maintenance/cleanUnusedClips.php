@@ -5,13 +5,12 @@
  *
  * @ingroup Maintenance
  */
-use MediaWiki\MediaWikiServices;
 
 require_once getenv( 'MW_INSTALL_PATH' ) !== false
 	? getenv( 'MW_INSTALL_PATH' ) . '/maintenance/Maintenance.php'
 	: __DIR__ . '/../../../maintenance/Maintenance.php';
 
-class cleanUnusedClips extends Maintenance {
+class CleanUnusedClips extends Maintenance {
 	private $clips;
 	private $thumbnails;
 
@@ -35,7 +34,7 @@ class cleanUnusedClips extends Maintenance {
 			$pages = $dbw->select(
 				'ei_pages',
 				'ei_page',
-				'ei_page > 0' ,
+				'ei_page > 0',
 				__METHOD__
 				);
 			$dbw->endAtomic( __METHOD__ );
@@ -65,12 +64,12 @@ class cleanUnusedClips extends Maintenance {
 					__METHOD__
 				);
 				$dbw->endAtomic( __METHOD__ );
-				if ( $expiration) {
+				if ( $expiration ) {
 					$limit = abs( $expiration ) - abs( $date->getTimestamp() );
 					if ( $limit < 0 ) {
 						if ( $soubor->clipThumbnail( $clip[0], false ) ) {
 							if ( $this->getOption( 'verbose' ) ) {
-								$this->output( "Expired before: " . strval( $limit ) ." - " . $clip[0] ."\n" );
+								$this->output( "Expired before: " . strval( $limit ) . " - " . $clip[0] . "\n" );
 							}
 						}
 					}
@@ -95,7 +94,7 @@ class cleanUnusedClips extends Maintenance {
 				if ( $soubor->clipThumbnail( $clip->ei_file ) ) {
 					$used = $soubor->dbClipArrayGet( $clip->ei_file );
 					if ( $this->getOption( 'verbose' ) ) {
-						$this->output( $clip->ei_file . " used " . count( $used ) . "x\n"  );
+						$this->output( $clip->ei_file . " used " . count( $used ) . "x\n" );
 					}
 				} else {
 					if ( $soubor->dbDeleteId( $clip->ei_file ) ) {
@@ -116,4 +115,3 @@ class cleanUnusedClips extends Maintenance {
 
 $maintClass = CleanUnusedClips::class;
 require_once RUN_MAINTENANCE_IF_MAIN;
-
