@@ -87,7 +87,7 @@ class EImageINFO {
 	/**
 	 * Try get item from the database by the curid string
 	 *
-	 * @param integer $curid page use clip
+	 * @param int $curid page use clip
 	 * @return mixed Array or false
 	 */
 	public static function dbGetPage( $curid ) {

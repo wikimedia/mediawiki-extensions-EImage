@@ -1446,22 +1446,25 @@ class EImageIMG extends EImageBOX {
 		case 7: /* DjVu */
 			$this->cropDjVuPage();
 			break;
-		case 0: // test support for bitmap formats
+		case 0: /* Test support for bitmap formats */
 			if ( !$gdtest['BMP Support'] ) {
 				// vrátit zprávu o tom, že BMP formát nemá podporu
 				return false;
 			}
-		case 1:
-		case 26: // test JPEG support
+			// BMP format supported
+		case 1: /* raw JPEG */
+		case 26:
 			if ( !$gdtest['JPEG Support'] ) {
 				// vrátit zprávu o tom, že JPEG formát nemá podporu
 				return false;
 			}
-		case 2: // test GIF format support
+			// JPEG supported
+		case 2:
 			if ( !$gdtest['GIF Create Support'] ) {
 				// vrátit zprávu o tom, že GIF formát nemá podporu
 				return false;
 			}
+			// GIF supported
 		case 3:
 			if ( !$gdtest['PNG Support'] ) {
 				// vrátit zprávu o tom, že PNG formát nemá podporu
