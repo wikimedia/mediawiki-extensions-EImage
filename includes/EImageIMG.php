@@ -762,9 +762,6 @@ class EImageIMG extends EImageBOX {
 
 	/**
 	 * Delete item form the database by id
-	 *
-	 * @param integer
-	 * @return bool
 	 */
 	function dbDeleteItem() {
 		$dbw = wfGetDB( DB_PRIMARY );
@@ -1151,7 +1148,6 @@ class EImageIMG extends EImageBOX {
 	 *
 	 * @param string $mime mimetype
 	 * @param resource $image
-	 * @param string path to file
 	 * @return mixed
 	 */
 	function exportNewImage( $mime, $image ) {
@@ -1450,18 +1446,18 @@ class EImageIMG extends EImageBOX {
 		case 7: /* DjVu */
 			$this->cropDjVuPage();
 			break;
-		case 0: /* bitmapové formáty */
+		case 0: // test support for bitmap formats
 			if ( !$gdtest['BMP Support'] ) {
 				// vrátit zprávu o tom, že BMP formát nemá podporu
 				return false;
 			}
 		case 1:
-		case 26:
+		case 26: // test JPEG support
 			if ( !$gdtest['JPEG Support'] ) {
 				// vrátit zprávu o tom, že JPEG formát nemá podporu
 				return false;
 			}
-		case 2:
+		case 2: // test GIF format support
 			if ( !$gdtest['GIF Create Support'] ) {
 				// vrátit zprávu o tom, že GIF formát nemá podporu
 				return false;
@@ -1672,7 +1668,7 @@ class EImageIMG extends EImageBOX {
 	/**
 	 * Parameters are parts of the EImageIMG object ID.
 	 *
-	 * @param string left-top corner is the zero point for shift of the crop area
+	 * @param string $string X and Y coordinate from left-top corner, where is the zero point for shift of the crop area
 	 */
 	function setEidAxes( $string = '' ) {
 		$axes = explode( ' ', trim( preg_replace( '/[\t\n\r\s]+/', ' ', $string ) ) );
@@ -1686,8 +1682,6 @@ class EImageIMG extends EImageBOX {
 
 	/**
 	 * 3. Parameters are parts of the EImageIMG object ID.
-	 *
-	 * @param string value from crop= attribute
 	 */
 	function setEidCrop() {
 		// If not set crop, use original size
@@ -1747,7 +1741,7 @@ class EImageIMG extends EImageBOX {
 	/**
 	 * Basic width of the original source image
 	 *
-	 * @param string width from attributes
+	 * @param string $string set width by attribute
 	 */
 	function setEidWidth( $string = '' ) {
 		// Resize original to new default width
@@ -1761,6 +1755,8 @@ class EImageIMG extends EImageBOX {
 
 	/**
 	 * 1. disable cache for this EImage instance is set 'nocache'
+	 *
+	 * @param bool $value false if is cache true
 	 */
 	function setCache( $value ) {
 		$this->cache = $value;
@@ -1863,10 +1859,12 @@ class EImageIMG extends EImageBOX {
 
 	/**
 	 * Converse string measures to float numbers
+	 *
+	 * @param string $string measure
 	 * @return array (float, typ)
 	 */
 	public static function vectorPixel( $string = '' ) {
-		switch ( substr($string, -2) ) {
+		switch ( substr( $string, -2 ) ) {
 		case 'pt':
 			$rozmer = floatval( substr( $string, 0, -2 ) ) * 1.333333333; // vypočtený rozměr v pixelech
 			$jednotka = 'pt';

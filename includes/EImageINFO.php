@@ -20,7 +20,7 @@ class EImageINFO {
 	/**
 	 * Try get item from the database by the md5 hash of file
 	 *
-	 * @param string
+	 * @param string $image sha1 checksum content of the clip
 	 * @return mixed Array or false
 	 */
 	public static function dbGetClipInfoByHash( $image ) {
@@ -87,7 +87,7 @@ class EImageINFO {
 	/**
 	 * Try get item from the database by the curid string
 	 *
-	 * @param integer
+	 * @param integer $curid page use clip
 	 * @return mixed Array or false
 	 */
 	public static function dbGetPage( $curid ) {
