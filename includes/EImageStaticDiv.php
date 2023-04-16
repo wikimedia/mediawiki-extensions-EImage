@@ -16,50 +16,6 @@ class EImageStaticDiv {
 	const ERR_NOT_EXIST = null;
 	const ERR_UNKNOWN_VALUE = 0;
 
-/*
-	Argumenty jsou předávané jako Array, kde
-	- [0] je objekt funkce (cesta k obrázku)
-	- [1] a další.. jsou objekty třídy PPNode_Hash_Tree, které obsahují parametry
-	tyto objekty vrací pole s polema. kde title vypadá takto:
-	[0] title [1] #eimg:obrázek.jpg
-	V případě, že je vstup zpracováván nějakou šablonou, navalí ho tak, jak ho vrací ta šablona.
-	Během dalšího zpracování přidává další argumenty. Takže lze provést zpracování pozičních i pojmenovaných atributů
-	https://doc.wikimedia.org/mediawiki-core/master/php/classPPNode__Hash__Tree.html
-
-	Test existence položky v lokální databázi však lze provést až v okamžiku, kdy proběhne detekce na crop
-
-	1, do databáze se uloží položka teprve po zpracování obrázku – nemá to vliv na další dění!
-	2, obrázek se pojmenuje jako md5sum serializovaného pole, kde je index []řetězce #eimg:obrázek.jpg volitelně rozšiřitelný o parametry pro crop
-		2a, parametr title nikdy nebude delší než těch 255 znaků
-		2b, parametr crop také nebude delší
-
-	3, při kontrole existence se zkontroluje čas expirace, na základě md5sumu se vytáhne serializované pole kde [0] bude  enkodovaný přes base64 tabulce text, vyhledá
-
-	Pole $properties funguje podobně jako fungovalo u šablon Image a block
-	Poziční parametry
-		0 – zdroj obrázku
-		1 - šířka bloku v procentech
-		2 - zbylý obsah – ten ale může obsahovat další kód,
-
-	Pozn.:
-		* Je-li zdroj obrázku none, zpracuje se obsah jako volný blok a do keše se nic nezapisuje
-		* Je-li zdroj obrázek, zapíše se do keše a použije se jako pozadí
-
-	Pojmenované parametry
-		crop - výřez (EImageIMG)
-		link - aktivní odkaz (EImageIMG)
-		resize - lupa
-		width - výchozí šířka bloku (nepovinný)
-		align - zarovnání
-		absolute - pozicování
-		border
-		class
-		color
-		page
-		alt
-		id
-*/
-
 	/**
 	 * Add input parameters into array $object->attribute
 	 *

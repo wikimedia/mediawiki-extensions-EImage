@@ -152,7 +152,8 @@ class EImageINFO {
 	 * Try get item from the database by the title string.
 	 * For same title can be founded more pages in more namespaces.
 	 *
-	 * @param int $curid page use clip
+	 * @param string $title name of the article
+	 * @param int|null $namespace if is null, list articles by identical title from all namespaces
 	 * @return mixed Array or false
 	 */
 	public static function dbGetPageByTitle( $title, $namespace = null ) {
@@ -176,7 +177,7 @@ class EImageINFO {
 		if ( count( $result ) > 0 ) {
 			$i = [];
 			foreach ( $result as $row ) {
-				if ( is_null( $namespace ) ) {
+				if ( $namespace === null ) {
 					$i['page_id']['title'] = $row->page_title;
 					$i['page_id']['namespaceid'] = $row->page_namespace;
 					$i['page_id']['redirect'] = $row->page_is_redirect;
@@ -253,7 +254,7 @@ class EImageINFO {
 	 * @return string
 	 */
 	public static function getInfo( $parser, $name = '', $meta = '' ) {
-		if ( empty($name) ) {
+		if ( empty( $name ) ) {
 			// info se bude týkat stránky ze které se funkce volá
 			$idpage = (int)RequestContext::getMain()->getWikiPage()->getId();
 			return $idpage;
@@ -273,7 +274,7 @@ class EImageINFO {
 				return 'eid';
 			} else {
 				$clip = self::dbGetClipInfoByHash( $name );
-				if ( is_array($clip) ) {
+				if ( is_array( $clip ) ) {
 					// 'ei_file' identifikátor klipu
 					switch ( $meta ) {
 					case 'clip': // vrátí parametry klipu uložené v JSON jako řetězec, který lze předhodit ke zpracování šabloně, nebo parsovací funkci
@@ -290,13 +291,13 @@ class EImageINFO {
 						return $string;
 					default:
 						return $clip['eid'];
-						//return 'clip';
+						// return 'clip';
 					}
 				} else {
 					// titul článku, nebo soubor?
 					$stranka = Title::newFromText( $name );
 					if ( $stranka instanceof Title ) {
-						$page = self::dbGetPageByTitle( $stranka->mTextform , $stranka->mNamespace );
+						$page = self::dbGetPageByTitle( $stranka->mTextform, $stranka->mNamespace );
 						if ( is_array( $page ) ) {
 							return 'article title';
 						}

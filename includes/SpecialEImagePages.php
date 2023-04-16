@@ -9,8 +9,8 @@
 
 namespace MediaWiki\Extension\EImage;
 
-use EImageINFO;
 use EImageBOX;
+use EImageINFO;
 use FormatJson;
 use SpecialPage;
 use Title;
@@ -136,10 +136,10 @@ class SpecialEImagePages extends SpecialPage {
 					// vyhledá podle title
 					$stranka = Title::newFromText( $page );
 					if ( $stranka instanceof Title ) {
-						$idpage = EImageINFO::dbGetPageByTitle( $stranka->mTextform , $stranka->mNamespace );
+						$idpage = EImageINFO::dbGetPageByTitle( $stranka->mTextform, $stranka->mNamespace );
 						if ( is_array( $idpage ) ) {
 							$clips = EImageINFO::dbGetClipsByCurid( $idpage['curid'] );
-								foreach ( $clips as $clip ) {
+							foreach ( $clips as $clip ) {
 								$output->wrapWikiMsg( "{{#einfo:{$clip}}}" );
 							}
 						}
