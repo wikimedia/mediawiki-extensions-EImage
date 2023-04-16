@@ -1,3 +1,7 @@
+version 3.6
+* New function #einfo
+* Special:EImagePages include supported
+
 version 3.5
 * EImageBOX support clip on background
   - accept new attribue padding

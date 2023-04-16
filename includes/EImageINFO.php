@@ -18,6 +18,32 @@ class EImageINFO {
 	private $eid; // identifikátor lokálního souboru
 
 	/**
+	 * Get 'ei_file' values of all clips used on the page, identified by curid
+	 *
+	 * @param int $curid DB id of the article
+	 * @return mixed Array or false
+	 */
+	public static function dbGetClipsByCurid( $curid ) {
+		$dbw = wfGetDB( DB_PRIMARY );
+		$dbw->startAtomic( __METHOD__ );
+		$result = $dbw->select(
+			'ei_pages',
+			'ei_image',
+			[ 'ei_page' => $curid ],
+			__METHOD__
+			);
+		$dbw->endAtomic( __METHOD__ );
+		if ( count( $result ) > 0 ) {
+			$i = [];
+			foreach ( $result as $row ) {
+				$i[] = $row->ei_image;
+			}
+			return $i;
+		}
+		return false;
+	}
+
+	/**
 	 * Try get item from the database by the md5 hash of file
 	 *
 	 * @param string $image sha1 checksum content of the clip
@@ -123,6 +149,58 @@ class EImageINFO {
 	}
 
 	/**
+	 * Try get item from the database by the title string.
+	 * For same title can be founded more pages in more namespaces.
+	 *
+	 * @param int $curid page use clip
+	 * @return mixed Array or false
+	 */
+	public static function dbGetPageByTitle( $title, $namespace = null ) {
+		$dbw = wfGetDB( DB_PRIMARY );
+		$dbw->startAtomic( __METHOD__ );
+		$result = $dbw->select(
+			'page',
+			[
+				'page_id',
+				'page_namespace',
+				'page_title',
+				'page_is_redirect',
+				'page_len',
+				'page_content_model',
+				'page_lang'
+			],
+			[ 'page_title' => $title ],
+			__METHOD__
+			);
+		$dbw->endAtomic( __METHOD__ );
+		if ( count( $result ) > 0 ) {
+			$i = [];
+			foreach ( $result as $row ) {
+				if ( is_null( $namespace ) ) {
+					$i['page_id']['title'] = $row->page_title;
+					$i['page_id']['namespaceid'] = $row->page_namespace;
+					$i['page_id']['redirect'] = $row->page_is_redirect;
+					$i['page_id']['size'] = $row->page_len;
+					$i['page_id']['content_model'] = $row->page_content_model;
+					$i['page_id']['lang'] = $row->page_lang;
+				} else {
+					if ( $row->page_namespace == $namespace ) {
+						$i['curid'] = $row->page_id;
+						$i['title'] = $row->page_title;
+						$i['namespaceid'] = $row->page_namespace;
+						$i['redirect'] = $row->page_is_redirect;
+						$i['size'] = $row->page_len;
+						$i['content_model'] = $row->page_content_model;
+						$i['lang'] = $row->page_lang;
+					}
+				}
+			}
+			return $i;
+		}
+		return false;
+	}
+
+	/**
 	 * Try get item from the database by the eid string
 	 *
 	 * @return bool
@@ -162,6 +240,69 @@ class EImageINFO {
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	/**
+	 * This method is used by #einfo. Output depend not only $name (file or the clip identifier),
+	 * but on meta value too.
+	 *
+	 * @param Parser $parser Calling parser
+	 * @param string $name File name
+	 * @param string $meta Metadata name
+	 * @return string
+	 */
+	public static function getInfo( $parser, $name = '', $meta = '' ) {
+		if ( empty($name) ) {
+			// info se bude týkat stránky ze které se funkce volá
+			$idpage = (int)RequestContext::getMain()->getWikiPage()->getId();
+			return $idpage;
+		} elseif ( is_numeric( $name ) ) {
+			// curid
+			$page = self::dbGetPage( $name );
+			$string = $name;
+			foreach ( $page as $key => $value ) {
+				$string .= ";{$key}={$value}";
+			}
+			return $string;
+		} else {
+			// hash or article?
+			$image = self::dbGetHashByHash( $name );
+			if ( $image ) {
+				// $name == 'ei_eid' identifikátor klipu
+				return 'eid';
+			} else {
+				$clip = self::dbGetClipInfoByHash( $name );
+				if ( is_array($clip) ) {
+					// 'ei_file' identifikátor klipu
+					switch ( $meta ) {
+					case 'clip': // vrátí parametry klipu uložené v JSON jako řetězec, který lze předhodit ke zpracování šabloně, nebo parsovací funkci
+						$string = $clip['eid'];
+						foreach ( FormatJson::decode( $clip['clip'], true ) as $key => $value ) {
+							$string .= ";{$key}={$value}";
+						}
+						return $string;
+					case 'exif': // vrátí exif tagy, uložené v JSON jako řetězec, který lze předhodit ke zpracování šabloně, nebo parsovací funkci
+						$string = $clip['eid'];
+						foreach ( FormatJson::decode( $clip['exif'], true )[0] as $key => $value ) {
+							$string .= ";{$key}={$value}";
+						}
+						return $string;
+					default:
+						return $clip['eid'];
+						//return 'clip';
+					}
+				} else {
+					// titul článku, nebo soubor?
+					$stranka = Title::newFromText( $name );
+					if ( $stranka instanceof Title ) {
+						$page = self::dbGetPageByTitle( $stranka->mTextform , $stranka->mNamespace );
+						if ( is_array( $page ) ) {
+							return 'article title';
+						}
+					}
+				}
+			}
 		}
 	}
 

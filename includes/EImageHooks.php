@@ -18,7 +18,7 @@ class EImageHooks {
 		// Function hook for base image container
 		$parser->setFunctionHook( 'eimg', [ 'EImageStaticDiv', 'image' ], SFH_OBJECT_ARGS );
 		// Function hook for check curid, or eid value
-		// $parser->setFunctionHook( 'einfo', [ 'EImageINFO', 'image' ], SFH_OBJECT_ARGS );
+		$parser->setFunctionHook( 'einfo', [ 'EImageINFO', 'getInfo' ] );
 		// Function hook for base block container
 		$parser->setFunctionHook( 'eibox', [ 'EImageStaticDiv', 'block' ], SFH_OBJECT_ARGS );
 		// Function hook for width img file

@@ -12,12 +12,8 @@ namespace MediaWiki\Extension\EImage;
 use EImageINFO;
 use EImageBOX;
 use FormatJson;
-use FormSpecialPage;
-use HTMLForm;
-use MediaWiki\Revision\RevisionLookup;
-use ParserFactory;
-use SearchEngineFactory;
 use SpecialPage;
+use Title;
 
 class SpecialEImagePages extends SpecialPage {
 
@@ -45,7 +41,6 @@ class SpecialEImagePages extends SpecialPage {
 	 * @return bool
 	 */
 	public function execute( $par ) {
-		global $wgScript;
 		$this->outputHeader();
 		$this->addHelpLink( 'Extension:EImage' );
 		$output = $this->getOutput();
@@ -73,9 +68,9 @@ class SpecialEImagePages extends SpecialPage {
 					$string .= EImageBox::poach( '<a href="' . $clip['source'] . '">' . $clip['source'] . '</a>' );
 				} else {
 					if ( $clip['page'] != 0 ) {
-						$string .= EImageBOX::poach( '<a href="' . $wgScript . '?title=File%3A' . $clip['source'] . '&page=' . $clip['page'] . '">' . $clip['source'] . '</a>' );
+						$string .= EImageBOX::poach( '<a href="' . $this->getConfig()->get( 'Script' ) . '?title=File%3A' . $clip['source'] . '&page=' . $clip['page'] . '">' . $clip['source'] . '</a>' );
 					} else {
-						$string .= EImageBox::poach( '<a href="' . $wgScript . '?title=File%3A' . $clip['source'] . '">' . $clip['source'] . '</a>' );
+						$string .= EImageBox::poach( '<a href="' . $this->getConfig()->get( 'Script' ) . '?title=File%3A' . $clip['source'] . '">' . $clip['source'] . '</a>' );
 					}
 				}
 				$string .= '<br />';
@@ -107,10 +102,10 @@ class SpecialEImagePages extends SpecialPage {
 					// print_r( $info );
 					switch ( $info['namespaceid'] ) {
 					case 250:
-						$string .= EImageBOX::poach( '<a href="' . $wgScript . '/Page:' . $info['title'] . '">' . 'Page:' . $info['title'] . '</a><br />' );
+						$string .= EImageBOX::poach( '<a href="' . $this->getConfig()->get( 'Script' ) . '/Page:' . $info['title'] . '">' . 'Page:' . $info['title'] . '</a><br />' );
 						break;
 					default:
-						$string .= EImageBOX::poach( '<a href="' . $wgScript . '/' . $info['title'] . '">' . $info['title'] . '</a><br />' );
+						$string .= EImageBOX::poach( '<a href="' . $this->getConfig()->get( 'Script' ) . '/' . $info['title'] . '">' . $info['title'] . '</a><br />' );
 						break;
 					}
 				}
@@ -128,7 +123,29 @@ class SpecialEImagePages extends SpecialPage {
 			}
 		} else {
 			// fungují šablony!!!
-			$output->wrapWikiMsg( "<div class=\"error\">$1</div>", 'Výstup při {{big|vložení}} do stránky přes {-{Special:EImagePages}-}' );
+			if ( $this->getPageTitle()->mTextform != $this->getFullTitle()->mTextform ) {
+				$page = substr( $this->getFullTitle()->mTextform, strpos( $this->getFullTitle()->mTextform, '/' ) + 1 );
+				if ( is_numeric( $page ) ) {
+					// vyhledá podle curid
+					$clips = EImageINFO::dbGetClipsByCurid( $page );
+					// print_r( $clips );
+					foreach ( $clips as $clip ) {
+						$output->wrapWikiMsg( "{{#einfo:{$clip}}}" );
+					}
+				} else {
+					// vyhledá podle title
+					$stranka = Title::newFromText( $page );
+					if ( $stranka instanceof Title ) {
+						$idpage = EImageINFO::dbGetPageByTitle( $stranka->mTextform , $stranka->mNamespace );
+						if ( is_array( $idpage ) ) {
+							$clips = EImageINFO::dbGetClipsByCurid( $idpage['curid'] );
+								foreach ( $clips as $clip ) {
+								$output->wrapWikiMsg( "{{#einfo:{$clip}}}" );
+							}
+						}
+					}
+				}
+			}
 		}
 		return true;
 	}

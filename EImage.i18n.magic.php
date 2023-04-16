@@ -14,6 +14,7 @@ $magicWords['en'] = [
    'eimage' => [ 0, 'eimage' ],
    'eimagea' => [ 0, 'eimagea' ],
    'eimg' => [ 0, 'eimg' ],
+   'einfo' => [ 0, 'einfo' ],
    'eibox' => [ 0, 'eibox' ],
    'eimgw' => [ 0, 'eimgw' ],
    'eimgh' => [ 0, 'eimgh' ],
