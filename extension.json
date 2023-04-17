@@ -18,6 +18,7 @@
 		]
 	},
 	"ExtensionMessagesFiles": {
+		"EImageAliases": "EImage.alias.php",
 		"EImageMagick": "EImage.i18n.magic.php"
 	},
 	"AutoloadNamespaces": {
