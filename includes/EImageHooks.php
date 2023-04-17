@@ -32,7 +32,7 @@ class EImageHooks {
 		// Function hook for size img file (for humans),
 		$parser->setFunctionHook( 'eimgsize', [ 'EImageIMG', 'eimageSize' ] );
 		// Function hook for img file mime info (type of file) - usable for detection another types
-		$parser->setFunctionHook( 'eimgmime', [ 'EImageIMG', 'eimageMime' ] );
+		// $parser->setFunctionHook( 'eimgmime', [ 'EImageIMG', 'eimageMime' ] );
 		// Function hook for summary count pages of the multipage img file as PDF, or DjVu
 		$parser->setFunctionHook( 'epages', [ 'EImageIMG', 'eimagePages' ] );
 		// Function hook for img exif info - parameter
