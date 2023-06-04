@@ -4,7 +4,7 @@
 			"Want"
 		]
 	},
-	"eimage-desc": "{{desc|name=EImage|url=https://www.mediawiki.org/wiki/Extension:EImage}}",
+	"eimage-desc": "Allows users use images from external hosts and storage used clips into local cache",
 	"eimagepages": "Clips",
 	"eimagepages-summary": "This page is review of the clips, generated the <code>#eimg</code> function. The EImage extension by default allows caching. Mode 'on-the-fly' is supported, but it increased demands on the server's computing power. If cache enabled, is the generated clip saved in the first pass, which used <code>#eimg</code>. For each next pass is used clip from cache, if any base attribut not changed. The clip exists, as long as the <code>#eimg</code> instantion is parametrically same. It can be reused on other place of the MediaWiki article everywhere wikitext supported. This page provides an overview of existing clips and their corresponding parameters.",
 	"eimagepages-nocache": "Only rarely you add the clipping parameters on the first, so is recommended use the attribute <code>nocache</code> to ensure that in the 'on-the-fly' process is caching disabled.",
