@@ -79,7 +79,11 @@ class EImageStatic {
 			// Replace links one by one. replaceChild() breaks loops so I have to do everything ever iteration.
 			$doc = new DOMDocument();
 			$doc->registerNodeClass( 'DOMElement', 'JSLikeHTMLElement' );
-			$doc->loadHTML( '<body>' . mb_convert_encoding( $text, 'html-entities', 'utf-8' ) . '</body>' );
+			$doc->loadHTML(
+				'<!doctype html><html><head><meta charset="UTF-8"/></head><body>' .
+				$text .
+				'</body></html>'
+			);
 			$links = $doc->getElementsByTagName( 'a' );
 			if ( $links->length < 1 ) {
 				break;
