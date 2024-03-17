@@ -584,48 +584,48 @@ class EImageIMG extends EImageBOX {
 			}
 			$path = $dirpath . DIRECTORY_SEPARATOR . $id . '.png';
 			switch ( substr( $string, 0, 7 ) ) {
-			case 'QVQmVEZ': // djvu
-			case 'JVBERi0': // pdf
-			case '0M8R4KG': // doc
-			case '/9j/4AA': // jpg
-			case 'R0lGODl': // gif
-			case 'iVBORw0': // png
-			case '/9j/2wB': // jpg
-				$thumb = imagescale( imagecreatefromstring( base64_decode( $string ) ), 180, -1, IMG_BICUBIC_FIXED );
-				imagepng( $thumb, $path );
-				unset( $string );
-				unset( $path );
-				break;
-			case 'PD94bWw': // svg
-				$tempFileSvg = tempnam( sys_get_temp_dir(), "SVG" );
-				$tempFilePng = tempnam( sys_get_temp_dir(), "PNG" );
-				file_put_contents( $tempFileSvg, base64_decode( $string ) );
-				unset( $string );
-				$svgReader = new SVGReader( $tempFileSvg );
-				$metadata = $svgReader->getMetadata();
-				if ( !isset( $metadata['width'] ) || !isset( $metadata['height'] ) ) {
-					// echo "Problém s načtením SVG souboru\n";
-					unlink( $tempFileSvg );
-					unlink( $tempFilePng );
+				case 'QVQmVEZ': // djvu
+				case 'JVBERi0': // pdf
+				case '0M8R4KG': // doc
+				case '/9j/4AA': // jpg
+				case 'R0lGODl': // gif
+				case 'iVBORw0': // png
+				case '/9j/2wB': // jpg
+					$thumb = imagescale( imagecreatefromstring( base64_decode( $string ) ), 180, -1, IMG_BICUBIC_FIXED );
+					imagepng( $thumb, $path );
+					unset( $string );
 					unset( $path );
-				} else {
-					$width = 180;
-					$height = $metadata['height'] / $metadata['width'] * $width;
-					$handler = new SvgHandler;
-					$res = $handler->rasterize(
+					break;
+				case 'PD94bWw': // svg
+					$tempFileSvg = tempnam( sys_get_temp_dir(), "SVG" );
+					$tempFilePng = tempnam( sys_get_temp_dir(), "PNG" );
+					file_put_contents( $tempFileSvg, base64_decode( $string ) );
+					unset( $string );
+					$svgReader = new SVGReader( $tempFileSvg );
+					$metadata = $svgReader->getMetadata();
+					if ( !isset( $metadata['width'] ) || !isset( $metadata['height'] ) ) {
+						// echo "Problém s načtením SVG souboru\n";
+						unlink( $tempFileSvg );
+						unlink( $tempFilePng );
+						unset( $path );
+					} else {
+						$width = 180;
+						$height = $metadata['height'] / $metadata['width'] * $width;
+						$handler = new SvgHandler;
+						$res = $handler->rasterize(
 						$tempFileSvg,
 						$path,
 						$width,
 						$height
-					);
-					unlink( $tempFileSvg );
-					unlink( $tempFilePng );
-					unset( $path );
-				}
-				break;
-			default:
-				// zatím s tím nic nenadělám
-				break;
+						);
+						unlink( $tempFileSvg );
+						unlink( $tempFilePng );
+						unset( $path );
+					}
+					break;
+				default:
+					// zatím s tím nic nenadělám
+					break;
 			}
 			return true;
 		}
@@ -818,32 +818,32 @@ class EImageIMG extends EImageBOX {
 				$this->iw = $row->ei_width;
 				$this->ih = $row->ei_height;
 				switch ( $row->ei_type ) {
-				case 1:
-				case 26:
-					$this->mime = 'image/jpeg';
-					$this->dbmimetype = 1;
-					$this->imgStorage = $this->getCacheLocal( $this->image . $this->suffix[1] );
-					break;
-				case 2:
-					$this->mime = 'image/gif';
-					$this->dbmimetype = 2;
-					$this->imgStorage = $this->getCacheLocal( $this->image . $this->suffix[2] );
-					break;
-				case 3:
-					$this->mime = 'image/png';
-					$this->dbmimetype = 3;
-					$this->imgStorage = $this->getCacheLocal( $this->image . $this->suffix[3] );
-					break;
-				case 4:
-				case 20:
-					$this->mime = 'image/svg+xml';
-					$this->dbmimetype = 4;
-					$this->imgStorage = $this->getCacheLocal( $this->image . $this->suffix[4] );
-					break;
-				default:
-					$this->mime = null;
-					$this->dbmimetype = null;
-					break;
+					case 1:
+					case 26:
+						$this->mime = 'image/jpeg';
+						$this->dbmimetype = 1;
+						$this->imgStorage = $this->getCacheLocal( $this->image . $this->suffix[1] );
+						break;
+					case 2:
+						$this->mime = 'image/gif';
+						$this->dbmimetype = 2;
+						$this->imgStorage = $this->getCacheLocal( $this->image . $this->suffix[2] );
+						break;
+					case 3:
+						$this->mime = 'image/png';
+						$this->dbmimetype = 3;
+						$this->imgStorage = $this->getCacheLocal( $this->image . $this->suffix[3] );
+						break;
+					case 4:
+					case 20:
+						$this->mime = 'image/svg+xml';
+						$this->dbmimetype = 4;
+						$this->imgStorage = $this->getCacheLocal( $this->image . $this->suffix[4] );
+						break;
+					default:
+						$this->mime = null;
+						$this->dbmimetype = null;
+						break;
 				}
 			}
 		}
@@ -1042,13 +1042,13 @@ class EImageIMG extends EImageBOX {
 		if ( $file instanceof File ) {
 			$mimetype = $file->getMimeType();
 			switch ( $mimetype ) {
-			case 'application/xml':
-			case 'image/svg+xml':
-				$this->mime = 4;
-				return 'image/svg+xml';
+				case 'application/xml':
+				case 'image/svg+xml':
+					$this->mime = 4;
+					return 'image/svg+xml';
 				break;
-			default:
-				return $mimetype;
+				default:
+					return $mimetype;
 				break;
 			}
 		}
@@ -1155,18 +1155,18 @@ class EImageIMG extends EImageBOX {
 		$name = $this->getName();
 		$path = tempnam( sys_get_temp_dir(), "NEW" );
 		switch ( $mime ) {
-		case 'image/jpeg':
-			imagejpeg( $image, $path );
-			$this->dbmimetype = 1;
-			break;
-		case 'image/gif':
-			imagegif( $image, $path );
-			$this->dbmimetype = 2;
-			break;
-		case 'image/png':
-			imagepng( $image, $path );
-			$this->dbmimetype = 3;
-			break;
+			case 'image/jpeg':
+				imagejpeg( $image, $path );
+				$this->dbmimetype = 1;
+				break;
+			case 'image/gif':
+				imagegif( $image, $path );
+				$this->dbmimetype = 2;
+				break;
+			case 'image/png':
+				imagepng( $image, $path );
+				$this->dbmimetype = 3;
+				break;
 		}
 		imagedestroy( $image );
 		if ( $wgEImageExif ) {
@@ -1211,36 +1211,36 @@ class EImageIMG extends EImageBOX {
 				$command = self::BoxedCommand()
 					->routeName( 'eimage-avif' );
 				switch ( $this->dbmimetype ) {
-				case 1:
-					$resultavif = $command
-					->params(
+					case 1:
+						$resultavif = $command
+						->params(
 						$wgEImageAvif['app'],
 						'-A',
 						'-o', 'file.avif',
 						'file.jpg'
-					)
-					// Založí soubor v dočasném adresáři a nakrmí do něj obsah souboru $object->getName()
-					->inputFileFromString( 'file.jpg', $toavif )
-					->outputFileToString( 'file.avif' )
-					->execute();
-					break;
-				case 2:
-					break;
-				case 3:
-					$resultavif = $command
-					->params(
+						)
+						// Založí soubor v dočasném adresáři a nakrmí do něj obsah souboru $object->getName()
+						->inputFileFromString( 'file.jpg', $toavif )
+						->outputFileToString( 'file.avif' )
+						->execute();
+						break;
+					case 2:
+						break;
+					case 3:
+						$resultavif = $command
+						->params(
 						$wgEImageAvif['app'],
 						'-A',
 						'-o', 'file.avif',
 						'file.png'
-					)
-					// Založí soubor v dočasném adresáři a nakrmí do něj obsah souboru $object->getName()
-					->inputFileFromString( 'file.png', $toavif )
-					->outputFileToString( 'file.avif' )
-					->execute();
-					break;
-				default:
-					break;
+						)
+						// Založí soubor v dočasném adresáři a nakrmí do něj obsah souboru $object->getName()
+						->inputFileFromString( 'file.png', $toavif )
+						->outputFileToString( 'file.avif' )
+						->execute();
+						break;
+					default:
+						break;
 				}
 				if ( $resultavif->getStderr() ) {
 					print_r( $resultavif->getExitCode() );
@@ -1304,14 +1304,14 @@ class EImageIMG extends EImageBOX {
 			if ( $content ) {
 				$this->imagecontent = base64_encode( $content );
 				switch ( $this->base64id[substr( $this->imagecontent, 0, 7 )] ) {
-				case 1:
-				case 26:
-					$this->dbmimetype = 1;
-					break;
-				case 4:
-				case 20:
-					$this->dbmimetype = 4;
-					break;
+					case 1:
+					case 26:
+						$this->dbmimetype = 1;
+						break;
+					case 4:
+					case 20:
+						$this->dbmimetype = 4;
+						break;
 				}
 				return true;
 			}
@@ -1438,42 +1438,42 @@ class EImageIMG extends EImageBOX {
 		// pole do $this->exif
 		$gdtest = gd_info();
 		switch ( $this->dbmimetype ) {
-		case 4: /* vektorové formáty SVG */
-		case 5: /* PDF */
-		case 20: /* vektorové formáty XML */
-			$this->cropPdfPage();
-			break;
-		case 7: /* DjVu */
-			$this->cropDjVuPage();
-			break;
-		case 0: /* Test support for bitmap formats */
-			if ( !$gdtest['BMP Support'] ) {
-				// vrátit zprávu o tom, že BMP formát nemá podporu
+			case 4: /* vektorové formáty SVG */
+			case 5: /* PDF */
+			case 20: /* vektorové formáty XML */
+				$this->cropPdfPage();
+				break;
+			case 7: /* DjVu */
+				$this->cropDjVuPage();
+				break;
+			case 0: /* Test support for bitmap formats */
+				if ( !$gdtest['BMP Support'] ) {
+					// vrátit zprávu o tom, že BMP formát nemá podporu
+					return false;
+				}
+				// BMP format supported
+			case 1: /* raw JPEG */
+			case 26:
+				if ( !$gdtest['JPEG Support'] ) {
+					// vrátit zprávu o tom, že JPEG formát nemá podporu
+					return false;
+				}
+				// JPEG supported
+			case 2:
+				if ( !$gdtest['GIF Create Support'] ) {
+					// vrátit zprávu o tom, že GIF formát nemá podporu
+					return false;
+				}
+				// GIF supported
+			case 3:
+				if ( !$gdtest['PNG Support'] ) {
+					// vrátit zprávu o tom, že PNG formát nemá podporu
+					return false;
+				}
+				$this->cropBitmapImage();
+				break;
+			default: // neznámý formát
 				return false;
-			}
-			// BMP format supported
-		case 1: /* raw JPEG */
-		case 26:
-			if ( !$gdtest['JPEG Support'] ) {
-				// vrátit zprávu o tom, že JPEG formát nemá podporu
-				return false;
-			}
-			// JPEG supported
-		case 2:
-			if ( !$gdtest['GIF Create Support'] ) {
-				// vrátit zprávu o tom, že GIF formát nemá podporu
-				return false;
-			}
-			// GIF supported
-		case 3:
-			if ( !$gdtest['PNG Support'] ) {
-				// vrátit zprávu o tom, že PNG formát nemá podporu
-				return false;
-			}
-			$this->cropBitmapImage();
-			break;
-		default: // neznámý formát
-			return false;
 		}
 		if ( strlen( $this->eid ) == 0 ) {
 		// print_r('Prázdné eid');
@@ -1868,30 +1868,30 @@ class EImageIMG extends EImageBOX {
 	 */
 	public static function vectorPixel( $string = '' ) {
 		switch ( substr( $string, -2 ) ) {
-		case 'pt':
-			$rozmer = floatval( substr( $string, 0, -2 ) ) * 1.333333333; // vypočtený rozměr v pixelech
-			$jednotka = 'pt';
-			break;
-		case 'px':
-			$rozmer = floatval( substr( $string, 0, -2 ) );
-			$jednotka = 'px';
-			break;
-		case 'mm':
-			$rozmer = floatval( substr( $string, 0, -2 ) ) * 3.78; // vypočtený rozměr v pixelech
-			$jednotka = 'mm';
-			break;
-		case 'in':
-			$rozmer = floatval( substr( $string, 0, -2 ) ) * 96; // vypočtený rozměr v pixelech
-			$jednotka = 'in';
-			break;
-		case 'pc':
-			$rozmer = floatval( substr( $string, 0, -2 ) ) * 16; // vypočtený rozměr v pixelech
-			$jednotka = 'pc';
-			break;
-		default:
-			$rozmer = floatval( $string ); // je to jen číslo
-			$jednotka = '';
-			break;
+			case 'pt':
+				$rozmer = floatval( substr( $string, 0, -2 ) ) * 1.333333333; // vypočtený rozměr v pixelech
+				$jednotka = 'pt';
+				break;
+			case 'px':
+				$rozmer = floatval( substr( $string, 0, -2 ) );
+				$jednotka = 'px';
+				break;
+			case 'mm':
+				$rozmer = floatval( substr( $string, 0, -2 ) ) * 3.78; // vypočtený rozměr v pixelech
+				$jednotka = 'mm';
+				break;
+			case 'in':
+				$rozmer = floatval( substr( $string, 0, -2 ) ) * 96; // vypočtený rozměr v pixelech
+				$jednotka = 'in';
+				break;
+			case 'pc':
+				$rozmer = floatval( substr( $string, 0, -2 ) ) * 16; // vypočtený rozměr v pixelech
+				$jednotka = 'pc';
+				break;
+			default:
+				$rozmer = floatval( $string ); // je to jen číslo
+				$jednotka = '';
+				break;
 		}
 		return [ 0 => $rozmer, 1 => $jednotka ];
 	}

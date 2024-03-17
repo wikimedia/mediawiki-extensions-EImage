@@ -277,20 +277,20 @@ class EImageINFO {
 				if ( is_array( $clip ) ) {
 					// 'ei_file' identifikátor klipu
 					switch ( $meta ) {
-					case 'clip': // vrátí parametry klipu uložené v JSON jako řetězec, který lze předhodit ke zpracování šabloně, nebo parsovací funkci
-						$string = $clip['eid'];
-						foreach ( FormatJson::decode( $clip['clip'], true ) as $key => $value ) {
-							$string .= ";{$key}={$value}";
-						}
-						return $string;
-					case 'exif': // vrátí exif tagy, uložené v JSON jako řetězec, který lze předhodit ke zpracování šabloně, nebo parsovací funkci
-						$string = $clip['eid'];
-						foreach ( FormatJson::decode( $clip['exif'], true )[0] as $key => $value ) {
-							$string .= ";{$key}={$value}";
-						}
-						return $string;
-					default:
-						return $clip['eid'];
+						case 'clip': // vrátí parametry klipu uložené v JSON jako řetězec, který lze předhodit ke zpracování šabloně, nebo parsovací funkci
+							$string = $clip['eid'];
+							foreach ( FormatJson::decode( $clip['clip'], true ) as $key => $value ) {
+								$string .= ";{$key}={$value}";
+							}
+							return $string;
+						case 'exif': // vrátí exif tagy, uložené v JSON jako řetězec, který lze předhodit ke zpracování šabloně, nebo parsovací funkci
+							$string = $clip['eid'];
+							foreach ( FormatJson::decode( $clip['exif'], true )[0] as $key => $value ) {
+								$string .= ";{$key}={$value}";
+							}
+							return $string;
+						default:
+							return $clip['eid'];
 						// return 'clip';
 					}
 				} else {

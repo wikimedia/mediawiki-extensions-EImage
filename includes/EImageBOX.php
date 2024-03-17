@@ -13,7 +13,7 @@ class EImageBOX {
 	public $onclick;
 	public $title;
 	public $bgSource = 'none'; // pozadí boxu
-	public $attribute = [ 'index' => [] , 'name' => [] ];
+	public $attribute = [ 'index' => [], 'name' => [] ];
 	public $content;
 	public $property = [];
 	public $params = []; // pole s vlastnostmi boxu
@@ -317,35 +317,35 @@ class EImageBOX {
 			if ( ( $this->attribute['index'][0] !== 'none' ) && ( !empty( $this->attribute['index'][0] ) ) ) {
 				$i = substr( $this->attribute['index'][0], 0, 1 );
 				switch ( $i ) {
-				case 'h': // URL začíná vždy h
-					$content = file_get_contents( $this->attribute['index'][0] );
-					$bgsize = getimagesizefromstring( $content );
-					$this->style[] = self::poach( "min-height: " . $bgsize[1] . "px;background-image:url(data:" . $bgsize['mime'] . ";base64," . base64_encode( $content ) . ");background-repeat: no-repeat; background-position: top left;" );
-					break;
-				case '/':
-					$content = file_get_contents( $wgLocalFileRepo['directory'] . $this->attribute['index'][0] );
-					$bgsize = getimagesizefromstring( $content );
-					$this->style[] = self::poach( "min-height: " . $bgsize[1] . "px;background-image:url(data:" . $bgsize['mime'] . ";base64," . base64_encode( $content ) . ");background-repeat: no-repeat; background-position: top left;" );
-					break;
-				default: // hash clipu nikdy nezačíná písmenem h
-					$hash = EImageINFO::dbGetHashByHash( $this->attribute['index'][0] );
-					if ( $hash ) {
-						// ei_eid
-						$clip = new EImageIMG;
-						$clip->setEid( $this->attribute['index'][0] );
-						$clip->dbGetClip();
-						$content = file_get_contents( $clip->imgStorage );
+					case 'h': // URL začíná vždy h
+						$content = file_get_contents( $this->attribute['index'][0] );
 						$bgsize = getimagesizefromstring( $content );
-						// clip on background
 						$this->style[] = self::poach( "min-height: " . $bgsize[1] . "px;background-image:url(data:" . $bgsize['mime'] . ";base64," . base64_encode( $content ) . ");background-repeat: no-repeat; background-position: top left;" );
-					} else {
-						// ei_file
-						$content = file_get_contents( $wgLocalFileRepo['directory'] . DIRECTORY_SEPARATOR . $wgEImageCache['path'] . DIRECTORY_SEPARATOR . 'thumbs' . DIRECTORY_SEPARATOR . $this->attribute['index'][0] . '.png' );
+						break;
+					case '/':
+						$content = file_get_contents( $wgLocalFileRepo['directory'] . $this->attribute['index'][0] );
 						$bgsize = getimagesizefromstring( $content );
-						// thumbnail on background - it use special page
 						$this->style[] = self::poach( "min-height: " . $bgsize[1] . "px;background-image:url(data:" . $bgsize['mime'] . ";base64," . base64_encode( $content ) . ");background-repeat: no-repeat; background-position: top left;" );
-					}
-					break;
+						break;
+					default: // hash clipu nikdy nezačíná písmenem h
+						$hash = EImageINFO::dbGetHashByHash( $this->attribute['index'][0] );
+						if ( $hash ) {
+							// ei_eid
+							$clip = new EImageIMG;
+							$clip->setEid( $this->attribute['index'][0] );
+							$clip->dbGetClip();
+							$content = file_get_contents( $clip->imgStorage );
+							$bgsize = getimagesizefromstring( $content );
+							// clip on background
+							$this->style[] = self::poach( "min-height: " . $bgsize[1] . "px;background-image:url(data:" . $bgsize['mime'] . ";base64," . base64_encode( $content ) . ");background-repeat: no-repeat; background-position: top left;" );
+						} else {
+							// ei_file
+							$content = file_get_contents( $wgLocalFileRepo['directory'] . DIRECTORY_SEPARATOR . $wgEImageCache['path'] . DIRECTORY_SEPARATOR . 'thumbs' . DIRECTORY_SEPARATOR . $this->attribute['index'][0] . '.png' );
+							$bgsize = getimagesizefromstring( $content );
+							// thumbnail on background - it use special page
+							$this->style[] = self::poach( "min-height: " . $bgsize[1] . "px;background-image:url(data:" . $bgsize['mime'] . ";base64," . base64_encode( $content ) . ");background-repeat: no-repeat; background-position: top left;" );
+						}
+						break;
 				}
 			}
 		}

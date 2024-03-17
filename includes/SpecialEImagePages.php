@@ -101,12 +101,12 @@ class SpecialEImagePages extends SpecialPage {
 					$info = EImageINFO::dbGetPage( $page->ei_page );
 					// print_r( $info );
 					switch ( $info['namespaceid'] ) {
-					case 250:
-						$string .= EImageBOX::poach( '<a href="' . $this->getConfig()->get( 'Script' ) . '/Page:' . $info['title'] . '">' . 'Page:' . $info['title'] . '</a><br />' );
-						break;
-					default:
-						$string .= EImageBOX::poach( '<a href="' . $this->getConfig()->get( 'Script' ) . '/' . $info['title'] . '">' . $info['title'] . '</a><br />' );
-						break;
+						case 250:
+							$string .= EImageBOX::poach( '<a href="' . $this->getConfig()->get( 'Script' ) . '/Page:' . $info['title'] . '">' . 'Page:' . $info['title'] . '</a><br />' );
+							break;
+						default:
+							$string .= EImageBOX::poach( '<a href="' . $this->getConfig()->get( 'Script' ) . '/' . $info['title'] . '">' . $info['title'] . '</a><br />' );
+							break;
 					}
 				}
 				$output->wrapWikiMsg(
