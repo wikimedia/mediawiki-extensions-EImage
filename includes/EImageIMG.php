@@ -391,7 +391,7 @@ class EImageIMG extends EImageBOX {
 		$author = $agent->addChild( 'dc:title', RequestContext::getMain()->getUser()->getName() );
 		$right = $work->addChild( 'dc:right' );
 		$rightagent = $right->addChild( 'cc:Agent' );
-		$copyright = $rightagent->addChild( 'dc:title', '(C) ' . date( "Y", mktime() ) . " ${wgMetaNamespace}" );
+		$copyright = $rightagent->addChild( 'dc:title', '(C) ' . date( "Y", mktime() ) . " {$wgMetaNamespace}" );
 		$urlsource = $work->addChild( 'dc:source', $this->imgSource );
 		$description = $work->addChild( 'dc:description', $this->title );
 		$contributor = $work->addChild( 'dc:contributor' );
@@ -522,7 +522,7 @@ class EImageIMG extends EImageBOX {
 			// Vypočítanou hodnotu je třeba zaokrouhlit na celé pixely
 			$neww = round( $this->cw * $resize );
 			$newh = round( $this->ch * $resize );
-			// echo "Rescale after crop to {$neww}x{$newh} by resize ${resize}\n";
+			// echo "Rescale after crop to {$neww}x{$newh} by resize {$resize}\n";
 			// Zmenšení obrázku podle nastaveného poměru
 			$image_r = imagecreatetruecolor( $neww, $newh );
 			$black = imagecolorallocate( $image_r, 0, 0, 0 );
@@ -1798,7 +1798,7 @@ class EImageIMG extends EImageBOX {
 		global $wgMetaNamespace;
 		$exifdata = ExtensionRegistry::getInstance()->getAllThings()['EImage'];
 		$data = [];
-		$data[0]['Producer'] = '@ ' . date( "Y", mktime() ) . " ${wgMetaNamespace}";
+		$data[0]['Producer'] = '@ ' . date( "Y", mktime() ) . " {$wgMetaNamespace}";
 		$data[0]['HistoryParameters'] = "Zpracováno rozšířením {$exifdata['name']} verze {$exifdata['version']}, které naprgal Aleš Kapica - Want";
 		if ( isset( $data[0]['HistorySoftwareAgent'] ) ) {
 			$history = explode( $exifdata['name'], $data[0]['HistoryParameters'] );
