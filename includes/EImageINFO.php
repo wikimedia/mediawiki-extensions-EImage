@@ -5,6 +5,8 @@
  * be found in the LICENSE.txt file.
  */
 
+use MediaWiki\MediaWikiServices;
+
 class EImageINFO {
 	private $id; // id stránky či souboru
 	private $title; // Název stránky
@@ -24,7 +26,7 @@ class EImageINFO {
 	 * @return mixed Array or false
 	 */
 	public static function dbGetClipsByCurid( $curid ) {
-		$dbw = wfGetDB( DB_PRIMARY );
+		$dbw = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_PRIMARY );
 		$dbw->startAtomic( __METHOD__ );
 		$result = $dbw->select(
 			'ei_pages',
@@ -50,7 +52,7 @@ class EImageINFO {
 	 * @return mixed Array or false
 	 */
 	public static function dbGetClipInfoByHash( $image ) {
-		$dbw = wfGetDB( DB_PRIMARY );
+		$dbw = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_PRIMARY );
 		$dbw->startAtomic( __METHOD__ );
 		$result = $dbw->select(
 			'ei_cache',
@@ -95,7 +97,7 @@ class EImageINFO {
 	 * @return string sha1 checksum content of the clip or false
 	 */
 	public static function dbGetHashByHash( $hash ) {
-		$dbw = wfGetDB( DB_PRIMARY );
+		$dbw = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_PRIMARY );
 		$dbw->startAtomic( __METHOD__ );
 		$result = $dbw->selectField(
 			'ei_cache',
@@ -117,7 +119,7 @@ class EImageINFO {
 	 * @return mixed Array or false
 	 */
 	public static function dbGetPage( $curid ) {
-		$dbw = wfGetDB( DB_PRIMARY );
+		$dbw = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_PRIMARY );
 		$dbw->startAtomic( __METHOD__ );
 		$result = $dbw->select(
 			'page',
@@ -157,7 +159,7 @@ class EImageINFO {
 	 * @return mixed Array or false
 	 */
 	public static function dbGetPageByTitle( $title, $namespace = null ) {
-		$dbw = wfGetDB( DB_PRIMARY );
+		$dbw = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_PRIMARY );
 		$dbw->startAtomic( __METHOD__ );
 		$result = $dbw->select(
 			'page',
@@ -207,7 +209,7 @@ class EImageINFO {
 	 * @return bool
 	 */
 	function dbGetByEid() {
-		$dbw = wfGetDB( DB_PRIMARY );
+		$dbw = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_PRIMARY );
 		$dbw->startAtomic( __METHOD__ );
 		$result = $dbw->select(
 			'ei_cache',

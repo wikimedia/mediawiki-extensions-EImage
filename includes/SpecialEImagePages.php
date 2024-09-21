@@ -12,6 +12,7 @@ namespace MediaWiki\Extension\EImage;
 use EImageBOX;
 use EImageINFO;
 use FormatJson;
+use MediaWiki\MediaWikiServices;
 use SpecialPage;
 use Title;
 
@@ -50,7 +51,7 @@ class SpecialEImagePages extends SpecialPage {
 			$output->addWikiMsg( $this->msg( 'eimagepages-expire' ) );
 			// nefungují šablony
 			// $output->addHtml( $vysledek );
-			$dbw = wfGetDB( DB_PRIMARY );
+			$dbw = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_PRIMARY );
 			$dbw->startAtomic( __METHOD__ );
 			$items = $dbw->select(
 				'ei_cache',

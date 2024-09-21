@@ -677,7 +677,7 @@ class EImageIMG extends EImageBOX {
 		if ( $this->cache == false ) {
 			return false;
 		}
-		$dbw = wfGetDB( DB_PRIMARY );
+		$dbw = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_PRIMARY );
 		$dbw->startAtomic( __METHOD__ );
 		$item = $dbw->selectField(
 			'ei_cache',
@@ -717,7 +717,7 @@ class EImageIMG extends EImageBOX {
 	 * @return array
 	 */
 	function dbClipArrayGet( $id ) {
-		$dbw = wfGetDB( DB_PRIMARY );
+		$dbw = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_PRIMARY );
 		$dbw->startAtomic( __METHOD__ );
 		$pages = $dbw->select(
 			'ei_pages',
@@ -744,7 +744,7 @@ class EImageIMG extends EImageBOX {
 	 * @return bool
 	 */
 	function dbDeleteId( $id ) {
-		$dbw = wfGetDB( DB_PRIMARY );
+		$dbw = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_PRIMARY );
 		$dbw->startAtomic( __METHOD__ );
 		$dbw->delete(
 			'ei_pages',
@@ -764,7 +764,7 @@ class EImageIMG extends EImageBOX {
 	 * Delete item form the database by id
 	 */
 	function dbDeleteItem() {
-		$dbw = wfGetDB( DB_PRIMARY );
+		$dbw = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_PRIMARY );
 		$dbw->startAtomic( __METHOD__ );
 		$dbw->delete( 'ei_cache',
 			[
@@ -788,7 +788,7 @@ class EImageIMG extends EImageBOX {
 		if ( !$this->cache ) {
 			return false;
 		}
-		$dbw = wfGetDB( DB_PRIMARY );
+		$dbw = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_PRIMARY );
 		$dbw->startAtomic( __METHOD__ );
 		$result = $dbw->select(
 			'ei_cache',
@@ -861,7 +861,7 @@ class EImageIMG extends EImageBOX {
 	 * @return bool
 	 */
 	function dbPage() {
-		$dbw = wfGetDB( DB_PRIMARY );
+		$dbw = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_PRIMARY );
 		$idpage = (int)RequestContext::getMain()->getWikiPage()->getId();
 		$dbw->startAtomic( __METHOD__ );
 		$item = $dbw->selectField(
@@ -897,7 +897,7 @@ class EImageIMG extends EImageBOX {
 	 */
 	public static function dbSetExpirationTime( $eid ) {
 		global $wgEImageCache;
-		$dbw = wfGetDB( DB_PRIMARY );
+		$dbw = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_PRIMARY );
 		$date = new DateTimeImmutable();
 		$timestamp = (int)$date->getTimestamp() + $wgEImageCache['expire'];
 		$dbw->startAtomic( __METHOD__ );
