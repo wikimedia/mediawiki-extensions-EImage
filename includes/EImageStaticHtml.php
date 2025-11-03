@@ -5,6 +5,8 @@
  * be found in the LICENSE.txt file.
  */
 
+use MediaWiki\Html\Html;
+
 class EImageStaticHtml {
 	/**
 	 * Handles building the HTML for framed images (thumbnails and frames).

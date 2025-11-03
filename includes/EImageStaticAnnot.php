@@ -5,6 +5,8 @@
  * be found in the LICENSE.txt file.
  */
 
+use MediaWiki\Html\Html;
+
 class EImageStaticAnnot {
 	/**
 	 * Read user input and return HTML for an annotation. Designed to work with EImage but works in any <div /> with

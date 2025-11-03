@@ -5,6 +5,8 @@
  * be found in the LICENSE.txt file.
  */
 
+use MediaWiki\Html\Html;
+
 class EImageBOX {
 	public $width; // šířka boxu
 	public $height; // výška boxu

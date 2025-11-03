@@ -5,7 +5,9 @@
  * be found in the LICENSE.txt file.
  */
 
+use MediaWiki\Html\Html;
 use MediaWiki\MediaWikiServices;
+use MediaWiki\Title\Title;
 
 class EImageIMG extends EImageBOX {
 

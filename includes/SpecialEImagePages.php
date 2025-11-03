@@ -13,8 +13,8 @@ use EImageBOX;
 use EImageINFO;
 use FormatJson;
 use MediaWiki\MediaWikiServices;
+use MediaWiki\Title\Title;
 use SpecialPage;
-use Title;
 
 class SpecialEImagePages extends SpecialPage {
 
