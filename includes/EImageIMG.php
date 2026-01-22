@@ -512,7 +512,9 @@ class EImageIMG extends EImageBOX {
 				imagecopyresampled( $image_p, $draft, abs( $this->cx ), abs( $this->cy ), 0, 0, $this->cw, $this->ch, $this->cw, $this->ch );
 				$image_c = imagecrop( $image_p, [ 'x' => 0, 'y' => 0, 'width' => $this->cw, 'height' => $this->ch ] );
 				// Výřez z posunutého obrázku
-				imagedestroy( $image_p );
+				if ( PHP_VERSION_ID < 80000 ) {
+					imagedestroy( $image_p );
+				}
 			}
 		}
 		// …a přeškálování
@@ -530,7 +532,9 @@ class EImageIMG extends EImageBOX {
 			$black = imagecolorallocate( $image_r, 0, 0, 0 );
 			imagecolortransparent( $image_r, $black );
 			imagecopyresampled( $image_r, $image_c, 0, 0, 0, 0, $neww, $newh, $this->cw, $this->ch );
-			imagedestroy( $image_c );
+			if ( PHP_VERSION_ID < 80000 ) {
+				imagedestroy( $image_c );
+			}
 			$draft = $image_r;
 		} else {
 			// Odeslání výřezu bez přeškálování – image_c se zruší ve funkci exportNewImage()
@@ -1170,7 +1174,9 @@ class EImageIMG extends EImageBOX {
 				$this->dbmimetype = 3;
 				break;
 		}
-		imagedestroy( $image );
+		if ( PHP_VERSION_ID < 80000 ) {
+			imagedestroy( $image );
+		}
 		if ( $wgEImageExif ) {
 			/* Tahle část nastaví nové parametry pro exif tagy */
 			$this->setNewExif();
