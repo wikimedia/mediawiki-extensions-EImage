@@ -12,11 +12,11 @@ namespace MediaWiki\Extension\EImage;
 use EImageBOX;
 use EImageINFO;
 use FormatJson;
+use IncludableSpecialPage;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use SpecialPage;
 
-class SpecialEImagePages extends SpecialPage {
+class SpecialEImagePages extends IncludableSpecialPage {
 
 	/** @var SearchEngineFactory */
 	private $searchEngineFactory;
@@ -32,7 +32,6 @@ class SpecialEImagePages extends SpecialPage {
 	 */
 	public function __construct() {
 		parent::__construct( 'EImagePages' );
-		$this->mIncludable = true;
 	}
 
 	/**
@@ -45,7 +44,7 @@ class SpecialEImagePages extends SpecialPage {
 		$this->outputHeader();
 		$this->addHelpLink( 'Extension:EImage' );
 		$output = $this->getOutput();
-		if ( !$this->mIncluding ) {
+		if ( !$this->including() ) {
 			$this->setHeaders();
 			$output->addWikiMsg( $this->msg( 'eimagepages-nocache' ) );
 			$output->addWikiMsg( $this->msg( 'eimagepages-expire' ) );
