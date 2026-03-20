@@ -61,7 +61,11 @@ class EImageStatic {
 		}
 		$json = (array)json_decode( curl_exec( $c ), true );
 		$status = (int)curl_getinfo( $c, CURLINFO_HTTP_CODE );
-		curl_close( $c );
+		if ( PHP_VERSION_ID < 80000 ) {
+			// MW <1.42
+			// phpcs:ignore MediaWiki.Usage.ForbiddenFunctions.curl_close
+			curl_close( $c );
+		}
 		return $status;
 	}
 

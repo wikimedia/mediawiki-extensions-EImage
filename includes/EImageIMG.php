@@ -513,6 +513,8 @@ class EImageIMG extends EImageBOX {
 				$image_c = imagecrop( $image_p, [ 'x' => 0, 'y' => 0, 'width' => $this->cw, 'height' => $this->ch ] );
 				// Výřez z posunutého obrázku
 				if ( PHP_VERSION_ID < 80000 ) {
+					// MW <1.42
+					// phpcs:ignore MediaWiki.Usage.ForbiddenFunctions.imagedestroy
 					imagedestroy( $image_p );
 				}
 			}
@@ -533,6 +535,8 @@ class EImageIMG extends EImageBOX {
 			imagecolortransparent( $image_r, $black );
 			imagecopyresampled( $image_r, $image_c, 0, 0, 0, 0, $neww, $newh, $this->cw, $this->ch );
 			if ( PHP_VERSION_ID < 80000 ) {
+				// MW <1.42
+				// phpcs:ignore MediaWiki.Usage.ForbiddenFunctions.imagedestroy
 				imagedestroy( $image_c );
 			}
 			$draft = $image_r;
@@ -1175,6 +1179,8 @@ class EImageIMG extends EImageBOX {
 				break;
 		}
 		if ( PHP_VERSION_ID < 80000 ) {
+			// MW <1.42
+			// phpcs:ignore MediaWiki.Usage.ForbiddenFunctions.imagedestroy
 			imagedestroy( $image );
 		}
 		if ( $wgEImageExif ) {
